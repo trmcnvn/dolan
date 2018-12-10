@@ -1,0 +1,5 @@
+debug = false
+token = "DISCORD_TOKEN"
+admins = []
+blocked-users = []
+disabled-commands = []
