@@ -1,5 +1,5 @@
 use crate::settings::SETTINGS;
-use chrono::{DateTime, Utc};
+use chrono::DateTime;
 use lazy_static::lazy_static;
 use log::debug;
 use serde_derive::Deserialize;
@@ -92,17 +92,15 @@ command!(command(_context, message, args) {
                 ).expect("Parsed timestamp").to_rfc3339();
 
                 message.channel_id
-                    .send_message(|m| m.embed(|e| {
-                        e
-                            .timestamp(timestamp)
-                            .author(|a| {
-                                a
-                                .icon_url(&tweet.user.profile_image_url_https)
-                                .name(&format!("@{} - #MAGA Tweet", tweet.user.screen_name))
-                                .url(&format!("https://twitter.com/{}", tweet.user.screen_name)))
-                                .description(tweet.text)
-                                .colour(Colour::BLUE)
-                            })
+                    .send_message(|m| {
+                        m.embed(|e| {
+                            e.timestamp(timestamp).author(|a| {
+                                a.icon_url(&tweet.user.profile_image_url_https)
+                                    .name(&format!("@{} - #MAGA Tweet", tweet.user.screen_name))
+                                    .url(&format!("https://twitter.com/{}", tweet.user.screen_name))
+
+                            }).description(tweet.text).colour(Colour::BLUE)
+                        })
                     })?;
             }
         }

@@ -1,6 +1,6 @@
 use crate::settings::SETTINGS;
-use env_logger;
-use log::info;
+use log::{LevelFilter, info};
+use env_logger::{Builder, WriteStyle};
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{help_commands, StandardFramework};
 use serenity::model::gateway::Ready;
@@ -18,11 +18,18 @@ impl EventHandler for Handler {
 }
 
 fn main() {
-    // Initialize logging
-    env_logger::init();
-
     // Load config
     let settings = SETTINGS.read().expect("Settings").clone();
+
+    // Initialize logging
+    let mut builder = Builder::new();
+    let level = match settings.debug {
+        true => LevelFilter::Debug,
+        false => LevelFilter::Info,
+    };
+    builder.filter(None, level)
+        .write_style(WriteStyle::Always)
+        .init();
 
     // Initialize connection to Discord via token
     let mut client = Client::new(settings.token.as_str(), Handler).expect("Connection to Discord");
