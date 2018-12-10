@@ -1,5 +1,4 @@
-use crate::settings::Settings;
-use config::{Config, Environment, File};
+use crate::settings::SETTINGS;
 use env_logger;
 use log::info;
 use serenity::client::{Client, Context, EventHandler};
@@ -23,13 +22,7 @@ fn main() {
     env_logger::init();
 
     // Load config
-    let mut config = Config::default();
-    config
-        .merge(File::with_name("settings"))
-        .unwrap()
-        .merge(Environment::with_prefix("DOLAN"))
-        .unwrap();
-    let settings: Settings = config.try_into().unwrap();
+    let settings = SETTINGS.read().expect("Settings").clone();
 
     // Initialize connection to Discord via token
     let mut client = Client::new(settings.token.as_str(), Handler).expect("Connection to Discord");
@@ -57,7 +50,9 @@ fn main() {
             );
         })
         .group("misc", |g| {
-            g.bucket("simple").cmd("ping", commands::misc::ping)
+            g.bucket("simple")
+                .cmd("ping", commands::misc::ping)
+                .cmd("trump", commands::misc::trump::command)
         })
         .group("repl", |g| {
             g.bucket("moderate")

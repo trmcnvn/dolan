@@ -7,7 +7,8 @@ use serenity::command;
 use serenity::utils::MessageBuilder;
 
 lazy_static! {
-    static ref CODE: Regex = Regex::new(r".+\n+\x60{3}(rust)\n([\s\S]*?)\x60{3}").unwrap();
+    static ref CODE: Regex =
+        Regex::new(r".+\n+\x60{3}(rust)\n([\s\S]*?)\x60{3}").expect("Compile regex");
 }
 
 #[derive(Debug, Serialize)]
@@ -55,7 +56,8 @@ command!(command(_context, message) {
     let client = reqwest::Client::new();
     let mut res = match client.post("https://play.integer32.com/execute").json(&payload).send() {
         Ok(res) => res,
-        Err(_) => {
+        Err(e) => {
+            debug!("Error: {:#?}", e);
             message.reply("There was an issue sending the code to the REPL.")?;
             return Ok(());
         }
@@ -65,8 +67,7 @@ command!(command(_context, message) {
     let json: RustResponse = match res.json() {
         Ok(json) => json,
         Err(e) => {
-            println!("{:?}", res);
-            println!("{:?}", e);
+            debug!("Error: {:#?}", e);
             message.reply("There was an issue with the response from the REPL.")?;
             return Ok(());
         }
