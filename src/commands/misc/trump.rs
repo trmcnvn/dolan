@@ -38,6 +38,7 @@ pub enum Timeline {
 #[derive(Debug, Deserialize)]
 pub struct Tweet {
     pub created_at: String,
+    #[serde(rename = "full_text")]
     pub text: String,
     pub user: TwitterUser,
 }
@@ -66,6 +67,7 @@ command!(command(_context, message, args) {
         ("trim_user", "false"),
         ("exclude_replies", "false"),
         ("include_rts", "true"),
+        ("tweet_mode", "extended"),
     ];
     let twitter = TWITTER.read().expect("Settings");
     match twitter.get(
