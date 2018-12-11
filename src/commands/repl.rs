@@ -1,3 +1,4 @@
+use hashbrown::HashMap;
 use lazy_static::lazy_static;
 use log::debug;
 use regex::Regex;
@@ -5,7 +6,6 @@ use reqwest;
 use serde_derive::{Deserialize, Serialize};
 use serenity::command;
 use serenity::utils::MessageBuilder;
-use hashbrown::HashMap;
 
 /// Taken from `maplit` crate to work with hashbrown.
 macro_rules! hashmap {
