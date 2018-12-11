@@ -1,5 +1,5 @@
-use serenity::command;
 use log::debug;
+use serenity::command;
 
 pub mod trump;
 

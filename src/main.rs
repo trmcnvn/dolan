@@ -1,6 +1,16 @@
+#![warn(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::style,
+    clippy::complexity,
+    clippy::perf,
+    clippy::correctness
+)]
+
 use crate::settings::SETTINGS;
-use log::{LevelFilter, debug};
 use env_logger::{Builder, WriteStyle};
+use log::{debug, LevelFilter};
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{help_commands, StandardFramework};
 use serenity::model::gateway::Ready;
@@ -19,15 +29,17 @@ impl EventHandler for Handler {
 
 fn main() {
     // Load config
-    let settings = SETTINGS.read().expect("Settings").clone();
+    let settings = SETTINGS.clone();
 
     // Initialize logging
     let mut builder = Builder::new();
-    let level = match settings.debug {
-        true => LevelFilter::Debug,
-        false => LevelFilter::Info,
+    let level = if settings.debug {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
     };
-    builder.filter(None, level)
+    builder
+        .filter(None, level)
         .write_style(WriteStyle::Always)
         .init();
 

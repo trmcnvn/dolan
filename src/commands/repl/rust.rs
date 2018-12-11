@@ -12,7 +12,7 @@ lazy_static! {
 }
 
 #[derive(Debug, Serialize)]
-pub struct RustRequest {
+pub struct Request {
     backtrace: bool,
     channel: String,
     #[serde(rename = "crateType")]
@@ -24,7 +24,7 @@ pub struct RustRequest {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct RustResponse {
+pub struct Response {
     pub stderr: String,
     pub stdout: String,
     pub success: bool,
@@ -32,16 +32,15 @@ pub struct RustResponse {
 
 // ?repl rust
 command!(command(_context, message) {
-    let caps = match CODE.captures(&message.content) {
-        Some(caps) => caps,
-        None => {
-            message.reply("Couldn't parse your code. Make sure you wrap it in codeblocks with ```rust")?;
-            return Ok(());
-        }
+    let caps = if let Some(caps) = CODE.captures(&message.content) {
+        caps
+    } else {
+        message.reply("Couldn't parse your code. Make sure you wrap it in codeblocks with ```rust")?;
+        return Ok(());
     };
 
     // build request payload
-    let payload = RustRequest {
+    let payload = Request {
         backtrace: false,
         channel: "nightly".into(),
         crate_type: "bin".into(),
@@ -64,7 +63,7 @@ command!(command(_context, message) {
     };
 
     // deserialize json response into struct
-    let json: RustResponse = match res.json() {
+    let json: Response = match res.json() {
         Ok(json) => json,
         Err(e) => {
             debug!("Error: {:#?}", e);
@@ -75,18 +74,15 @@ command!(command(_context, message) {
     debug!("Rust response: {:?}", json);
 
     // reply to user
-    let message_builder = match json.success {
-        true => {
-            let output: String = format!("{}\n{}", json.stdout, json.stderr);
-            MessageBuilder::new()
-                .mention(&message.author)
-                .push(" ")
-                .push("here's the output:")
-                .push_codeblock(output, Some("rust"))
-                .build()
-        }
-
-        false => MessageBuilder::new()
+    let message_builder = if json.success {
+        MessageBuilder::new()
+            .mention(&message.author)
+            .push(" ")
+            .push("here's the output:")
+            .push_codeblock(json.stdout, Some("rust"))
+            .build()
+    } else {
+        MessageBuilder::new()
             .mention(&message.author)
             .push(" ")
             .push("your compilation failed... yikes...")

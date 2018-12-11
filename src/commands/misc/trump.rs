@@ -5,28 +5,26 @@ use log::debug;
 use serde_derive::Deserialize;
 use serenity::command;
 use serenity::utils::Colour;
-use std::sync::RwLock;
 use twapi::{Twapi, UserAuth};
 
 lazy_static! {
-    pub static ref TWITTER: RwLock<UserAuth> = RwLock::new({
-        let settings = SETTINGS.read().expect("Settings");
+    pub static ref TWITTER: UserAuth = {
         let twitter = UserAuth::new(
-            settings.twitter.consumer_api_key.as_str(),
-            settings.twitter.consumer_api_secret.as_str(),
-            settings.twitter.access_token.as_str(),
-            settings.twitter.access_token_secret.as_str(),
+            SETTINGS.twitter.consumer_api_key.as_str(),
+            SETTINGS.twitter.consumer_api_secret.as_str(),
+            SETTINGS.twitter.access_token.as_str(),
+            SETTINGS.twitter.access_token_secret.as_str(),
         );
         let params: Vec<(&str, &str)> = vec![
             ("include_entities", "false"),
             ("skip_status", "true"),
             ("include_email", "false"),
         ];
-        if let Err(_) = twitter.get_verify_credentials(&params) {
+        if twitter.get_verify_credentials(&params).is_err() {
             panic!("Couldn't verify Twitter credentials");
         }
         twitter
-    });
+    };
 }
 
 #[derive(Debug, Deserialize)]
@@ -69,8 +67,7 @@ command!(command(_context, message, args) {
         ("include_rts", "true"),
         ("tweet_mode", "extended"),
     ];
-    let twitter = TWITTER.read().expect("Settings");
-    match twitter.get(
+    match TWITTER.get(
         "https://api.twitter.com/1.1/statuses/user_timeline.json",
         &params,
     ) {

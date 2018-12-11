@@ -2,7 +2,6 @@ use config::{Config, Environment, File};
 use hashbrown::HashSet;
 use lazy_static::lazy_static;
 use serde_derive::Deserialize;
-use std::sync::RwLock;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
@@ -25,7 +24,7 @@ pub struct Settings {
 }
 
 lazy_static! {
-    pub static ref SETTINGS: RwLock<Settings> = RwLock::new({
+    pub static ref SETTINGS: Settings = {
         let mut config = Config::default();
         config
             .merge(File::with_name("settings"))
@@ -33,5 +32,5 @@ lazy_static! {
             .merge(Environment::with_prefix("DOLAN"))
             .expect("Settings loaded from ENV");
         config.try_into().expect("Settings deserialization")
-    });
+    };
 }

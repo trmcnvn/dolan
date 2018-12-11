@@ -12,23 +12,23 @@ lazy_static! {
 }
 
 #[derive(Debug, Serialize)]
-pub struct GoRequest {
+pub struct Request {
     version: u32,
     body: String,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct GoResponse {
+pub struct Response {
     pub errors: String,
-    pub events: Option<Vec<GoEvent>>,
+    pub events: Option<Vec<Event>>,
     pub status: u32,
     pub tests_failed: u32,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct GoEvent {
+pub struct Event {
     pub delay: u32,
     pub kind: String,
     pub message: String,
@@ -36,16 +36,15 @@ pub struct GoEvent {
 
 // ?repl go
 command!(command(_context, message) {
-    let caps = match CODE.captures(&message.content) {
-        Some(caps) => caps,
-        None => {
-            message.reply("Couldn't parse your code. Make sure you wrap it in codeblocks with ```go")?;
-            return Ok(());
-        }
+    let caps = if let Some(caps) = CODE.captures(&message.content) {
+        caps
+    } else {
+        message.reply("Couldn't parse your code. Make sure you wrap it in codeblocks with ```go")?;
+        return Ok(());
     };
 
     // build request payload
-    let payload = GoRequest {
+    let payload = Request {
         version: 2,
         body: caps[2].into()
     };
@@ -63,7 +62,7 @@ command!(command(_context, message) {
     };
 
     // deserialize json response into struct
-    let json: GoResponse = match res.json() {
+    let json: Response = match res.json() {
         Ok(json) => json,
         Err(e) => {
             debug!("Error: {:#?}", e);
