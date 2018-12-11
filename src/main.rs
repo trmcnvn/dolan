@@ -74,10 +74,7 @@ fn main() {
                 .cmd("trump", commands::misc::trump::command)
         })
         .group("repl", |g| {
-            g.bucket("moderate")
-                .prefix("repl")
-                .cmd("rust", commands::repl::rust::command)
-                .cmd("go", commands::repl::go::command)
+            g.bucket("moderate").cmd("repl", commands::repl::command)
         });
     client.with_framework(framework);
 
