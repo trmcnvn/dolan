@@ -51,7 +51,7 @@ pub struct TwitterUser {
 command!(command(_context, message, args) {
     // num of tweets to get, but limit to 5
     let count = match args.current() {
-        Some(count) if count.parse::<u32>().expect("Parsing count") < 5 => count,
+        Some(count) if count.parse::<u32>().expect("Parsing count") <= 5 => count,
         Some(_) => {
             message.reply("The limit is 5. #MAGA")?;
             "5"

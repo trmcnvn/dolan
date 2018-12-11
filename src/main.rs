@@ -1,5 +1,5 @@
 use crate::settings::SETTINGS;
-use log::{LevelFilter, info};
+use log::{LevelFilter, debug};
 use env_logger::{Builder, WriteStyle};
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{help_commands, StandardFramework};
@@ -37,7 +37,7 @@ fn main() {
     // Build the framework setup
     let framework = StandardFramework::new()
         .simple_bucket("simple", 2)
-        .simple_bucket("moderate", 5)
+        .simple_bucket("moderate", 6)
         .configure(|c| {
             c.allow_dm(true)
                 .on_mention(true)
@@ -51,7 +51,7 @@ fn main() {
         })
         .help(help_commands::with_embeds)
         .after(|_, message, command, _error| {
-            info!(
+            debug!(
                 "Received command {} from @{}#{}",
                 command, message.author.name, message.author.discriminator
             );

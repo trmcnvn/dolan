@@ -1,9 +1,10 @@
 use serenity::command;
+use log::debug;
 
 pub mod trump;
 
 command!(ping(_context, message) {
     if let Err(e) = message.reply("Pong!") {
-        println!("Error sending pong: {:?}", e);
+        debug!("Error sending pong: {:?}", e);
     }
 });
