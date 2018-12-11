@@ -77,7 +77,7 @@ command!(command(_context, message, args) {
                 Ok(json) => json,
                 Err(e) => {
                     debug!("Error: {:#?}", e);
-                    message.reply("There was an issue with the response from the REPL.")?;
+                    message.reply("There was an issue with the response from Twitter.")?;
                     return Ok(());
                 }
             };
