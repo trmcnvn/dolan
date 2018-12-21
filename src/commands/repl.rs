@@ -49,7 +49,7 @@ lazy_static! {
         "mysql" => ("mysql", ".sql"),
         "objc" => ("objective-c", ".m"),
         "perl" => ("perl", ".pl"),
-        "python" => ("python", ".py"),
+        "python" => ("python3", ".py"),
         "r" => ("r", ".R"),
         "ruby" => ("ruby", ".rb"),
         "rust" => ("rust", ".rs"),

@@ -6,6 +6,7 @@ use serde_derive::Deserialize;
 use serenity::command;
 use serenity::utils::Colour;
 use twapi::{Twapi, UserAuth};
+use htmlescape::decode_html;
 
 lazy_static! {
     pub static ref TWITTER: UserAuth = {
@@ -98,7 +99,7 @@ command!(command(_context, message, args) {
                                     .name(&format!("@{} - #MAGA Tweet", tweet.user.screen_name))
                                     .url(&format!("https://twitter.com/{}", tweet.user.screen_name))
 
-                            }).description(tweet.text).colour(Colour::BLUE)
+                            }).description(decode_html(&tweet.text).unwrap_or(String::new())).colour(Colour::BLUE)
                         })
                     })?;
             }
