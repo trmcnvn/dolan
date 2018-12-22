@@ -1,7 +1,9 @@
 use log::debug;
 use serenity::command;
 
+pub mod repl;
 pub mod trump;
+pub mod weather;
 
 command!(ping(_context, message) {
     if let Err(e) = message.reply("Pong!") {

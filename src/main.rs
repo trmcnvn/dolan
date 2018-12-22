@@ -49,7 +49,6 @@ fn main() {
     // Build the framework setup
     let framework = StandardFramework::new()
         .simple_bucket("simple", 2)
-        .simple_bucket("moderate", 6)
         .configure(|c| {
             c.allow_dm(true)
                 .on_mention(true)
@@ -71,10 +70,9 @@ fn main() {
         .group("misc", |g| {
             g.bucket("simple")
                 .cmd("ping", commands::misc::ping)
+                .cmd("repl", commands::misc::repl::command)
                 .cmd("trump", commands::misc::trump::command)
-        })
-        .group("repl", |g| {
-            g.bucket("moderate").cmd("repl", commands::repl::command)
+                .cmd("weather", commands::misc::weather::command)
         });
     client.with_framework(framework);
 

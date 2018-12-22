@@ -1,12 +1,12 @@
 use crate::settings::SETTINGS;
 use chrono::DateTime;
+use htmlescape::decode_html;
 use lazy_static::lazy_static;
 use log::debug;
 use serde_derive::Deserialize;
 use serenity::command;
 use serenity::utils::Colour;
 use twapi::{Twapi, UserAuth};
-use htmlescape::decode_html;
 
 lazy_static! {
     pub static ref TWITTER: UserAuth = {
