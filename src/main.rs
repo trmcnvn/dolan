@@ -10,11 +10,10 @@
 
 use crate::settings::SETTINGS;
 use env_logger::{Builder, WriteStyle};
-use log::{debug, LevelFilter};
+use log::{debug, info, LevelFilter};
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{help_commands, StandardFramework};
 use serenity::model::gateway::Ready;
-use serenity::model::id::UserId;
 
 mod commands;
 mod settings;
@@ -23,7 +22,7 @@ pub struct Handler;
 impl EventHandler for Handler {
     fn ready(&self, context: Context, _ready: Ready) {
         context.set_game("?help");
-        println!("Dolan is connected...");
+        info!("Dolan is connected...");
     }
 }
 
@@ -39,7 +38,7 @@ fn main() {
         LevelFilter::Info
     };
     builder
-        .filter(None, level)
+        .filter(Some("dolan"), level)
         .write_style(WriteStyle::Always)
         .init();
 
@@ -54,10 +53,7 @@ fn main() {
                 .on_mention(true)
                 .allow_whitespace(false)
                 .depth(2)
-                .owners(settings.admins.into_iter().map(UserId).collect())
-                .blocked_users(settings.blocked_users.into_iter().map(UserId).collect())
-                .disabled_commands(settings.disabled_commands.into_iter().collect())
-                .prefixes(vec!["%", "!", "~", "?"])
+                .prefix("?")
                 .case_insensitivity(true)
         })
         .help(help_commands::with_embeds)
@@ -67,13 +63,11 @@ fn main() {
                 command, message.author.name, message.author.discriminator
             );
         })
-        .group("misc", |g| {
-            g.bucket("simple")
-                .cmd("ping", commands::misc::ping)
-                .cmd("repl", commands::misc::repl::command)
-                .cmd("trump", commands::misc::trump::command)
-                .cmd("weather", commands::misc::weather::command)
-        });
+        .cmd("ping", commands::ping::Ping)
+        .cmd("repl", commands::repl::Repl)
+        .cmd("trump", commands::trump::Trump)
+        .cmd("weather", commands::weather::Weather)
+        .cmd("time", commands::time::Time);
     client.with_framework(framework);
 
     if let Err(e) = client.start_autosharded() {

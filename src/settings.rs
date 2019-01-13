@@ -1,5 +1,4 @@
 use config::{Config, Environment, File};
-use hashbrown::HashSet;
 use lazy_static::lazy_static;
 use serde_derive::Deserialize;
 
@@ -17,9 +16,6 @@ pub struct Twitter {
 pub struct Settings {
     pub debug: bool,
     pub token: String,
-    pub admins: HashSet<u64>,
-    pub blocked_users: HashSet<u64>,
-    pub disabled_commands: HashSet<String>,
     pub twitter: Twitter,
 }
 

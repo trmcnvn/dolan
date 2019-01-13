@@ -18,6 +18,7 @@ regex = "1.1"
 twapi = "0.4.1"
 chrono = { version = "0.4", features = ["serde"] }
 htmlescape = "0.3"
+select = "0.4"
 
 [dependencies.serenity]
 default-features = false

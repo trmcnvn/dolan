@@ -1,8 +1,5 @@
-debug = false
+debug = true
 token = "DISCORD_TOKEN"
-admins = []
-blocked-users = []
-disabled-commands = []
 
 [twitter]
 consumer-api-key = "TWITTER_TOKEN"
