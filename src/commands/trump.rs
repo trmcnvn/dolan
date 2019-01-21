@@ -133,7 +133,11 @@ impl Command for Trump {
                                         ))
                                 })
                                 .description(decode_html(&real_tweet.text).unwrap_or_default())
-                                .colour(Colour::BLUE)
+                                .colour(if tweet.retweeted_status.is_some() {
+                                    Colour::RED
+                                } else {
+                                    Colour::BLUE
+                                })
                         })
                     })?;
                 }
