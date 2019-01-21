@@ -39,6 +39,7 @@ pub enum Timeline {
 
 #[derive(Debug, Deserialize)]
 pub struct Tweet {
+    pub id: i64,
     pub created_at: String,
     #[serde(rename = "full_text")]
     pub text: String,
@@ -122,10 +123,13 @@ impl Command for Trump {
                             e.timestamp(timestamp)
                                 .author(|a| {
                                     a.icon_url(&real_tweet.user.profile_image_url_https)
-                                        .name(&format!("@{} - #MAGA Tweet", real_tweet.user.screen_name))
-                                        .url(&format!(
-                                            "https://twitter.com/{}",
+                                        .name(&format!(
+                                            "@{} - #MAGA Tweet",
                                             real_tweet.user.screen_name
+                                        ))
+                                        .url(&format!(
+                                            "https://twitter.com/{}/status/{}",
+                                            real_tweet.user.screen_name, real_tweet.id,
                                         ))
                                 })
                                 .description(decode_html(&real_tweet.text).unwrap_or_default())
