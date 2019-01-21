@@ -106,9 +106,7 @@ pub struct Repl;
 impl Command for Repl {
     fn options(&self) -> Arc<CommandOptions> {
         Arc::new(CommandOptions {
-            desc: Some(
-                "Read-Eval-Print-Loop: Parses your codeblock and returns the result".into(),
-            ),
+            desc: Some("Read-Eval-Print-Loop: Parses your codeblock and returns the result".into()),
             usage: Some("?repl <code_block>".into()),
             min_args: Some(1),
             ..CommandOptions::default()

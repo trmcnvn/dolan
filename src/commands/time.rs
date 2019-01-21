@@ -1,10 +1,10 @@
+use reqwest;
+use select::document::Document;
+use select::predicate::Attr;
 use serenity::framework::standard::{Args, Command, CommandError as Error, CommandOptions};
 use serenity::model::channel::Message;
 use serenity::prelude::Context;
 use std::sync::Arc;
-use reqwest;
-use select::document::Document;
-use select::predicate::Attr;
 
 pub struct Time;
 impl Command for Time {

@@ -34,7 +34,7 @@ lazy_static! {
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum Timeline {
-    Tweet(Vec<Tweet>),
+    Tweets(Vec<Tweet>),
 }
 
 #[derive(Debug, Deserialize)]
@@ -43,6 +43,7 @@ pub struct Tweet {
     #[serde(rename = "full_text")]
     pub text: String,
     pub user: TwitterUser,
+    pub retweeted_status: Option<Box<Tweet>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -98,27 +99,36 @@ impl Command for Trump {
                     }
                 };
                 debug!("Twitter response: {:#?}", timeline);
-                let Timeline::Tweet(tweets) = timeline;
+                let Timeline::Tweets(tweets) = timeline;
 
                 // iterate over the tweets and post them as an embed
                 for tweet in tweets {
+                    // convert to usable timestamp
                     let timestamp =
                         DateTime::parse_from_str(&tweet.created_at, "%a %h %d %H:%M:%S %z %Y")
                             .expect("Parsed timestamp")
                             .to_rfc3339();
 
+                    // get reference to the actual tweet or retweet
+                    let real_tweet = if let Some(retweet) = &tweet.retweeted_status {
+                        &retweet
+                    } else {
+                        &tweet
+                    };
+
+                    // actually send the message...
                     message.channel_id.send_message(|m| {
                         m.embed(|e| {
                             e.timestamp(timestamp)
                                 .author(|a| {
-                                    a.icon_url(&tweet.user.profile_image_url_https)
-                                        .name(&format!("@{} - #MAGA Tweet", tweet.user.screen_name))
+                                    a.icon_url(&real_tweet.user.profile_image_url_https)
+                                        .name(&format!("@{} - #MAGA Tweet", real_tweet.user.screen_name))
                                         .url(&format!(
                                             "https://twitter.com/{}",
-                                            tweet.user.screen_name
+                                            real_tweet.user.screen_name
                                         ))
                                 })
-                                .description(decode_html(&tweet.text).unwrap_or_default())
+                                .description(decode_html(&real_tweet.text).unwrap_or_default())
                                 .colour(Colour::BLUE)
                         })
                     })?;
