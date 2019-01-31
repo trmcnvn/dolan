@@ -1,3 +1,4 @@
+use log::debug;
 use reqwest;
 use select::document::Document;
 use select::predicate::Attr;
@@ -6,7 +7,6 @@ use serenity::model::channel::Message;
 use serenity::prelude::Context;
 use serenity::utils::MessageBuilder;
 use std::sync::Arc;
-use log::debug;
 
 pub struct Time;
 impl Command for Time {
@@ -36,14 +36,24 @@ impl Command for Time {
             let document = Document::from_read(response).unwrap();
             let time = document.find(Attr("id", "twd")).next().unwrap().text();
             let human_timezone = document.find(Attr("id", "msgdiv")).next().unwrap().text();
+            if human_timezone.trim().is_empty() {
+                message.reply(&format!(
+                    "{} isn't valid... yikes... you really should learn your timezones.",
+                    validated_timezone
+                ))?;
+                continue;
+            }
+
             times.push(format!("{}: {}", human_timezone.trim(), time.trim()));
         }
-        let message_builder = MessageBuilder::new()
-            .mention(&message.author)
-            .push(" ")
-            .push_codeblock(times.join("\n"), None)
-            .build();
-        message.channel_id.say(&message_builder)?;
+        if !times.is_empty() {
+            let message_builder = MessageBuilder::new()
+                .mention(&message.author)
+                .push(" ")
+                .push_codeblock(times.join("\n"), None)
+                .build();
+            message.channel_id.say(&message_builder)?;
+        }
         Ok(())
     }
 }
