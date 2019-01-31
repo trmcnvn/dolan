@@ -100,6 +100,7 @@ pub struct Response {
 pub enum RunnerResult {
     Success,
     Failure,
+    Timeout,
 }
 
 pub struct Repl;
@@ -189,6 +190,10 @@ impl Command for Repl {
                 .push("your compilation failed... yikes...")
                 .push_codeblock(json.stderr.unwrap(), Some(&caps[1]))
                 .build(),
+            Some(RunnerResult::Timeout) => MessageBuilder::new()
+                .mention(&message.author)
+                .push(" your code timed out... yikes...")
+                .build(),
             None => {
                 if let Some(stderr) = json.build_stderr {
                     MessageBuilder::new()
@@ -206,7 +211,11 @@ impl Command for Repl {
                 }
             }
         };
-        message.channel_id.say(&message_builder)?;
+        if message_builder.len() >= 2000 {
+            message.reply("the response was too large...")?;
+        } else {
+            message.channel_id.say(&message_builder)?;
+        }
         Ok(())
     }
 }
