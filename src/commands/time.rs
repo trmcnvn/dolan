@@ -25,12 +25,13 @@ impl Command for Time {
         let timezones: Vec<&str> = args.rest().split(",").collect();
         let mut times: Vec<String> = Vec::with_capacity(timezones.len());
         for timezone in timezones {
-            if timezone.trim().is_empty() {
+            let validated_timezone = timezone.replace(|c: char| !c.is_ascii(), "");
+            if validated_timezone.trim().is_empty() {
                 continue;
             }
 
-            debug!("Timezone: {}", timezone);
-            let endpoint = format!("https://time.is/{}", timezone);
+            debug!("Timezone: {}", validated_timezone);
+            let endpoint = format!("https://time.is/{}", validated_timezone);
             let response = reqwest::get(&endpoint).unwrap();
             let document = Document::from_read(response).unwrap();
             let time = document.find(Attr("id", "twd")).next().unwrap().text();
