@@ -6,6 +6,7 @@ use serenity::model::channel::Message;
 use serenity::prelude::Context;
 use serenity::utils::MessageBuilder;
 use std::sync::Arc;
+use log::debug;
 
 pub struct Time;
 impl Command for Time {
@@ -16,7 +17,6 @@ impl Command for Time {
             ),
             usage: Some("?time <timezone/city/country>".into()),
             min_args: Some(1),
-            max_args: Some(1),
             ..CommandOptions::default()
         })
     }
@@ -25,6 +25,11 @@ impl Command for Time {
         let timezones: Vec<&str> = args.rest().split(",").collect();
         let mut times: Vec<String> = Vec::with_capacity(timezones.len());
         for timezone in timezones {
+            if timezone.trim().is_empty() {
+                continue;
+            }
+
+            debug!("Timezone: {}", timezone);
             let endpoint = format!("https://time.is/{}", timezone);
             let response = reqwest::get(&endpoint).unwrap();
             let document = Document::from_read(response).unwrap();
