@@ -22,7 +22,7 @@ impl Command for Time {
     }
 
     fn execute(&self, _context: &mut Context, message: &Message, args: Args) -> Result<(), Error> {
-        let timezones: Vec<&str> = args.rest().split(",").collect();
+        let timezones: Vec<&str> = args.rest().split(',').collect();
         let mut times: Vec<String> = Vec::with_capacity(timezones.len());
         for timezone in timezones {
             let validated_timezone = timezone.replace(|c: char| !c.is_ascii(), "");
