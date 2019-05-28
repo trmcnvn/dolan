@@ -1,4 +1,3 @@
-use hashbrown::HashMap;
 use lazy_static::lazy_static;
 use log::debug;
 use regex::Regex;
@@ -9,24 +8,7 @@ use serenity::model::channel::Message;
 use serenity::prelude::Context;
 use serenity::utils::MessageBuilder;
 use std::sync::Arc;
-
-/// Taken from `maplit` crate to work with hashbrown.
-macro_rules! hashmap {
-    (@single $($x:tt)*) => (());
-    (@count $($rest:expr),*) => (<[()]>::len(&[$(hashmap!(@single $rest)),*]));
-
-    ($($key:expr => $value:expr,)+) => { hashmap!($($key => $value),+) };
-    ($($key:expr => $value:expr),*) => {
-        {
-            let _cap = hashmap!(@count $($key),*);
-            let mut _map = ::hashbrown::HashMap::with_capacity(_cap);
-            $(
-                let _ = _map.insert($key, $value);
-            )*
-            _map
-        }
-    };
-}
+use std::collections::HashMap;
 
 lazy_static! {
     static ref CODE: Regex =

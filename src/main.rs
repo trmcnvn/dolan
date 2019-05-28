@@ -8,6 +8,9 @@
     clippy::correctness
 )]
 
+#[macro_use]
+extern crate serenity;
+
 use crate::settings::SETTINGS;
 use env_logger::{Builder, WriteStyle};
 use log::{debug, info, LevelFilter};
@@ -15,6 +18,8 @@ use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{help_commands, StandardFramework};
 use serenity::model::gateway::Ready;
 
+#[macro_use]
+mod utils;
 mod commands;
 mod settings;
 
@@ -63,11 +68,13 @@ fn main() {
                 command, message.author.name, message.author.discriminator
             );
         })
-        .cmd("ping", commands::ping::Ping)
+        .command("ping", |c| c.cmd(commands::ping::cmd))
         .cmd("repl", commands::repl::Repl)
         .cmd("trump", commands::trump::Trump)
         .cmd("weather", commands::weather::Weather)
-        .cmd("time", commands::time::Time);
+        .cmd("time", commands::time::Time)
+        .command("omega", |c| c.cmd(commands::omega::cmd))
+        .command("russia", |c| c.cmd(commands::russia::cmd));
     client.with_framework(framework);
 
     if let Err(e) = client.start_autosharded() {
