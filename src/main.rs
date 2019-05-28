@@ -69,10 +69,10 @@ fn main() {
             );
         })
         .command("ping", |c| c.cmd(commands::ping::cmd))
-        .cmd("repl", commands::repl::Repl)
-        .cmd("trump", commands::trump::Trump)
-        .cmd("weather", commands::weather::Weather)
-        .cmd("time", commands::time::Time)
+        .command("repl", |c| c.cmd(commands::repl::cmd))
+        .command("trump", |c| c.cmd(commands::trump::cmd))
+        .command("weather", |c| c.cmd(commands::weather::cmd))
+        .command("time", |c| c.cmd(commands::time::cmd))
         .command("omega", |c| c.cmd(commands::omega::cmd))
         .command("russia", |c| c.cmd(commands::russia::cmd));
     client.with_framework(framework);

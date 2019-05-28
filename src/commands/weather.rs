@@ -1,24 +1,9 @@
 use log::debug;
 use reqwest::{self, header::USER_AGENT};
-use serenity::framework::standard::{Args, Command, CommandError as Error, CommandOptions};
-use serenity::model::channel::Message;
-use serenity::prelude::Context;
 use serenity::utils::MessageBuilder;
-use std::sync::Arc;
 
-pub struct Weather;
-impl Command for Weather {
-    fn options(&self) -> Arc<CommandOptions> {
-        Arc::new(CommandOptions {
-            desc: Some("Gets the weather information for the area specified".into()),
-            usage: Some("?weather <location/coordinates/IATA airport code>".into()),
-            min_args: Some(1),
-            ..CommandOptions::default()
-        })
-    }
-
-    fn execute(&self, _context: &mut Context, message: &Message, args: Args) -> Result<(), Error> {
-        let location = args.current().unwrap_or_default();
+command!(cmd(_ctx, message, args) {
+    let location = args.current().unwrap_or_default();
         let endpoint = format!("https://wttr.in/{}?0qT&lang=en", location);
 
         let client = reqwest::Client::new();
@@ -50,6 +35,4 @@ impl Command for Weather {
             let message_builder = MessageBuilder::new().push_codeblock(text, None).build();
             message.channel_id.say(&message_builder)?;
         }
-        Ok(())
-    }
-}
+});

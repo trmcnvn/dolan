@@ -4,11 +4,7 @@ use htmlescape::decode_html;
 use lazy_static::lazy_static;
 use log::debug;
 use serde_derive::Deserialize;
-use serenity::framework::standard::{Args, Command, CommandError as Error, CommandOptions};
-use serenity::model::channel::Message;
-use serenity::prelude::Context;
 use serenity::utils::Colour;
-use std::sync::Arc;
 use twapi::{Twapi, UserAuth};
 
 lazy_static! {
@@ -53,20 +49,8 @@ pub struct TwitterUser {
     pub profile_image_url_https: String,
 }
 
-pub struct Trump;
-impl Command for Trump {
-    fn options(&self) -> Arc<CommandOptions> {
-        Arc::new(CommandOptions {
-            desc: Some("Gets the latest tweets from the Commander in Chief, Ultimate Leader, Very Cool, Very Legal, Trump! #MAGA".into()),
-            usage: Some("?trump <tweet_count>".into()),
-            min_args: Some(0),
-            max_args: Some(1),
-            ..CommandOptions::default()
-        })
-    }
-
-    fn execute(&self, _context: &mut Context, message: &Message, args: Args) -> Result<(), Error> {
-        // num of tweets to get, but limit to 5
+command!(cmd(_ctx, message, args) {
+    // num of tweets to get, but limit to 5
         let count = match args.current() {
             Some(count) if count.parse::<u32>().expect("Parsing count") <= 5 => count,
             Some(_) => {
@@ -147,6 +131,4 @@ impl Command for Trump {
                 message.reply("Sorry, there was an issue getting the tweet(s). #MAGA")?;
             }
         };
-        Ok(())
-    }
-}
+});

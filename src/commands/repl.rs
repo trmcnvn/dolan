@@ -3,11 +3,7 @@ use log::debug;
 use regex::Regex;
 use reqwest;
 use serde_derive::{Deserialize, Serialize};
-use serenity::framework::standard::{Args, Command, CommandError as Error, CommandOptions};
-use serenity::model::channel::Message;
-use serenity::prelude::Context;
 use serenity::utils::MessageBuilder;
-use std::sync::Arc;
 use std::collections::HashMap;
 
 lazy_static! {
@@ -85,19 +81,8 @@ pub enum RunnerResult {
     Timeout,
 }
 
-pub struct Repl;
-impl Command for Repl {
-    fn options(&self) -> Arc<CommandOptions> {
-        Arc::new(CommandOptions {
-            desc: Some("Read-Eval-Print-Loop: Parses your codeblock and returns the result".into()),
-            usage: Some("?repl <code_block>".into()),
-            min_args: Some(1),
-            ..CommandOptions::default()
-        })
-    }
-
-    fn execute(&self, _context: &mut Context, message: &Message, _args: Args) -> Result<(), Error> {
-        let caps = if let Some(caps) = CODE.captures(&message.content) {
+command!(cmd(_ctx, message) {
+    let caps = if let Some(caps) = CODE.captures(&message.content) {
             caps
         } else {
             message
@@ -198,6 +183,4 @@ impl Command for Repl {
         } else {
             message.channel_id.say(&message_builder)?;
         }
-        Ok(())
-    }
-}
+});
