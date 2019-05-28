@@ -1,10 +1,17 @@
 use crate::utils::get_emoji_by_name;
 use serenity::utils::MessageBuilder;
+use regex::Regex;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref OMEGA: Regex = Regex::new(r"[oO0]").expect("Regexp to compile");
+}
 
 command!(cmd(_ctx, message, args) {
     let target = args.rest();
-    let emoji = get_emoji_by_name(message.guild_id, "OMEGALUL");
-    let result = target.replace("o", &emoji).replace("O", &emoji);
+    let result = OMEGA.replace_all(target, |_captures: &regex::Captures| {
+        get_emoji_by_name(message.guild_id, "OMEGALUL")
+    });
     let response = MessageBuilder::new().push(result).build();
     message.channel_id.say(&response)?;
 });
