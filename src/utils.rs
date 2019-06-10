@@ -14,7 +14,6 @@ pub fn get_emoji_by_name(guild_id: Option<GuildId>, name: &str) -> String {
     String::from("<:grey_question:582795707401109506>")
 }
 
-
 /// Taken from `maplit` crate to work with hashbrown.
 macro_rules! hashmap {
     (@single $($x:tt)*) => (());

@@ -1,7 +1,7 @@
 use crate::utils::get_emoji_by_name;
-use serenity::utils::MessageBuilder;
-use regex::Regex;
 use lazy_static::lazy_static;
+use regex::Regex;
+use serenity::utils::MessageBuilder;
 
 lazy_static! {
     static ref OMEGA: Regex = Regex::new(r"[oO0]").expect("Regexp to compile");

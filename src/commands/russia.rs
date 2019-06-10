@@ -1,9 +1,9 @@
-use serenity::utils::MessageBuilder;
 use lazy_static::lazy_static;
+use serenity::utils::MessageBuilder;
 use std::collections::HashMap;
 
 lazy_static! {
-    static ref LANG_MAP: HashMap<char, char> = hashmap!{
+    static ref LANG_MAP: HashMap<char, char> = hashmap! {
         'a' => 'д',
         'b' => 'б',
         'e' => 'ё',
@@ -24,7 +24,6 @@ lazy_static! {
         'X' => 'Ж',
     };
 }
-
 
 command!(cmd(_ctx, message, args) {
     let mut target = String::new();
