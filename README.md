@@ -2,4 +2,4 @@
 
 ## Dolan
 
-Simple Discord bot for our personal server.
+Simple Discord bot used on a personal Discord server.

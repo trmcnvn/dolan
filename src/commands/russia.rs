@@ -1,5 +1,8 @@
 use lazy_static::lazy_static;
-use serenity::utils::MessageBuilder;
+use maplit::hashmap;
+use serenity::framework::standard::{macros::command, Args, CommandResult};
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 use std::collections::HashMap;
 
 lazy_static! {
@@ -25,7 +28,8 @@ lazy_static! {
     };
 }
 
-command!(cmd(_ctx, message, args) {
+#[command]
+fn russia(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let mut target = String::new();
     for c in args.rest().chars() {
         if LANG_MAP.contains_key(&c) {
@@ -34,6 +38,6 @@ command!(cmd(_ctx, message, args) {
             target.push(c);
         }
     }
-    let response = MessageBuilder::new().push(target).build();
-    message.channel_id.say(&response)?;
-});
+    msg.channel_id.say(&ctx, target)?;
+    Ok(())
+}

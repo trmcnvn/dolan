@@ -8,28 +8,44 @@
     clippy::correctness
 )]
 
-#[macro_use]
-extern crate serenity;
-
-use crate::settings::SETTINGS;
-use env_logger::{Builder, WriteStyle};
-use log::{debug, info, LevelFilter};
-use serenity::client::{Client, Context, EventHandler};
-use serenity::framework::standard::{help_commands, StandardFramework};
-use serenity::model::gateway::Ready;
-
-#[macro_use]
-mod utils;
 mod commands;
 mod settings;
+mod utils;
 
-pub struct Handler;
+use crate::settings::SETTINGS;
+use commands::{omega::*, ping::*, repl::*, russia::*, time::*, trump::*, weather::*};
+use env_logger::{Builder, WriteStyle};
+use log::{debug, info, LevelFilter};
+use serenity::{
+    client::bridge::gateway::ShardManager,
+    framework::{standard::macros::group, StandardFramework},
+    model::gateway::{Activity, Ready},
+    prelude::*,
+};
+use std::{collections::HashSet, sync::Arc};
+
+struct ShardManagerContainer;
+impl TypeMapKey for ShardManagerContainer {
+    type Value = Arc<Mutex<ShardManager>>;
+}
+
+// Discord Event Handler
+struct Handler;
 impl EventHandler for Handler {
-    fn ready(&self, context: Context, _ready: Ready) {
-        context.set_game("?help");
-        info!("Dolan is connected...");
+    fn ready(&self, context: Context, ready: Ready) {
+        let activity = Activity::playing("World of Warcraft");
+        context.set_activity(activity);
+
+        info!("{} is connected...", ready.user.name);
     }
 }
+
+// Command Groups
+group!({
+    name: "general",
+    options: {},
+    commands: [ping, omega, time, repl, russia, trump, weather]
+});
 
 fn main() {
     // Load config
@@ -49,34 +65,43 @@ fn main() {
 
     // Initialize connection to Discord via token
     let mut client = Client::new(settings.token.as_str(), Handler).expect("Connection to Discord");
+    {
+        let mut data = client.data.write();
+        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+    }
+
+    // Get owner information
+    let (owners, bot_id) = match client.cache_and_http.http.get_current_application_info() {
+        Ok(info) => {
+            let mut owners = HashSet::new();
+            owners.insert(info.owner.id);
+            (owners, info.id)
+        }
+        Err(why) => panic!("Could not access application info: {:?}", why),
+    };
 
     // Build the framework setup
     let framework = StandardFramework::new()
-        .simple_bucket("simple", 2)
         .configure(|c| {
             c.allow_dm(true)
-                .on_mention(true)
-                .allow_whitespace(false)
-                .depth(2)
-                .prefix("?")
                 .case_insensitivity(true)
+                .no_dm_prefix(true)
+                .on_mention(Some(bot_id))
+                .prefix("?")
+                .owners(owners)
+                .with_whitespace(false)
         })
-        .help(help_commands::with_embeds)
-        .after(|_, message, command, _error| {
+        .before(|_ctx, msg, command| {
             debug!(
-                "Received command {} from @{}#{}",
-                command, message.author.name, message.author.discriminator
+                "Received command '{}' from '{}#{}'",
+                command, msg.author.name, msg.author.discriminator
             );
+            true
         })
-        .command("ping", |c| c.cmd(commands::ping::cmd))
-        .command("repl", |c| c.cmd(commands::repl::cmd))
-        .command("trump", |c| c.cmd(commands::trump::cmd))
-        .command("weather", |c| c.cmd(commands::weather::cmd))
-        .command("time", |c| c.cmd(commands::time::cmd))
-        .command("omega", |c| c.cmd(commands::omega::cmd))
-        .command("russia", |c| c.cmd(commands::russia::cmd));
+        .group(&GENERAL_GROUP);
     client.with_framework(framework);
 
+    // Start the application
     if let Err(e) = client.start_autosharded() {
         println!("Uh-oh, Dolan malfunctioned: {:#?}", e);
     }

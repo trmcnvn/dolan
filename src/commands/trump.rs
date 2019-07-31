@@ -4,6 +4,9 @@ use htmlescape::decode_html;
 use lazy_static::lazy_static;
 use log::debug;
 use serde_derive::Deserialize;
+use serenity::framework::standard::{macros::command, Args, CommandResult};
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 use serenity::utils::Colour;
 use twapi::{Twapi, UserAuth};
 
@@ -49,12 +52,13 @@ pub struct TwitterUser {
     pub profile_image_url_https: String,
 }
 
-command!(cmd(_ctx, message, args) {
+#[command]
+fn trump(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     // num of tweets to get, but limit to 5
     let count = match args.current() {
         Some(count) if count.parse::<u32>().expect("Parsing count") <= 5 => count,
         Some(_) => {
-            message.reply("The limit is 5. #MAGA")?;
+            msg.reply(&ctx, "The limit is 5. #MAGA")?;
             "5"
         }
         None => "1",
@@ -79,11 +83,10 @@ command!(cmd(_ctx, message, args) {
                 Ok(json) => json,
                 Err(e) => {
                     debug!("Error: {:#?}", e);
-                    message.reply("There was an issue with the response from Twitter.")?;
+                    msg.reply(&ctx, "There was an issue with the response from Twitter.")?;
                     return Ok(());
                 }
             };
-            debug!("Twitter response: {:#?}", timeline);
             let Timeline::Tweets(tweets) = timeline;
 
             // iterate over the tweets and post them as an embed
@@ -102,7 +105,7 @@ command!(cmd(_ctx, message, args) {
                 };
 
                 // actually send the message...
-                message.channel_id.send_message(|m| {
+                msg.channel_id.send_message(&ctx, |m| {
                     m.embed(|e| {
                         e.timestamp(timestamp)
                             .author(|a| {
@@ -128,7 +131,11 @@ command!(cmd(_ctx, message, args) {
         }
         Err(e) => {
             debug!("Error: {:#?}", e);
-            message.reply("Sorry, there was an issue getting the tweet(s). #MAGA")?;
+            msg.reply(
+                &ctx,
+                "Sorry, there was an issue getting the tweet(s). #MAGA",
+            )?;
         }
     };
-});
+    Ok(())
+}

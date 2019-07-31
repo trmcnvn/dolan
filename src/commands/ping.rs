@@ -1,7 +1,11 @@
 use crate::utils::get_emoji_by_name;
-use serenity::utils::MessageBuilder;
+use serenity::framework::standard::{macros::command, CommandResult};
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 
-command!(cmd(_ctx, message) {
-    let response = MessageBuilder::new().push(get_emoji_by_name(message.guild_id, "Pog")).build();
-    message.channel_id.say(&response)?;
-});
+#[command]
+fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.channel_id
+        .say(&ctx, get_emoji_by_name(&ctx, msg.guild_id, "Pog"))?;
+    Ok(())
+}

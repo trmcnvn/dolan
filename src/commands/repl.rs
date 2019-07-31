@@ -1,8 +1,12 @@
 use lazy_static::lazy_static;
 use log::debug;
+use maplit::hashmap;
 use regex::Regex;
 use reqwest;
 use serde_derive::{Deserialize, Serialize};
+use serenity::framework::standard::{macros::command, CommandResult};
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 use std::collections::HashMap;
 
@@ -81,106 +85,108 @@ pub enum RunnerResult {
     Timeout,
 }
 
-command!(cmd(_ctx, message) {
-    let caps = if let Some(caps) = CODE.captures(&message.content) {
-            caps
-        } else {
-            message
-                .reply("Couldn't parse your code. Make sure you wrap it in language codeblocks.")?;
+#[command]
+fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let caps = if let Some(caps) = CODE.captures(&msg.content) {
+        caps
+    } else {
+        msg.reply(
+            &ctx,
+            "Couldn't parse your code. Make sure you wrap it in language codeblocks.",
+        )?;
+        return Ok(());
+    };
+
+    // supported language?
+    let (language_name, language_ext) = if let Some(language) = LANGUAGES.get(&caps[1]) {
+        language
+    } else {
+        msg.reply(&ctx, "The REPL doesn't support that language.")?;
+        return Ok(());
+    };
+
+    // build request payload
+    let payload = Request {
+        project: Project {
+            language: language_name.to_string(),
+            network: true,
+            output_type: None,
+            share: "private".into(),
+            source_files: vec![File {
+                filename: format!("main{}", language_ext),
+                body: caps[2].to_string(),
+                position: 0,
+            }],
+        },
+        run: true,
+        save: false,
+    };
+
+    // make request to the playground
+    let client = reqwest::Client::new();
+    let mut res = match client
+        .post("https://paiza.io/api/projects.json")
+        .json(&payload)
+        .send()
+    {
+        Ok(res) => res,
+        Err(e) => {
+            debug!("Error: {:#?}", e);
+            msg.reply(&ctx, "There was an issue sending the code to the REPL.")?;
             return Ok(());
-        };
-
-        // supported language?
-        let (language_name, language_ext) = if let Some(language) = LANGUAGES.get(&caps[1]) {
-            language
-        } else {
-            message.reply("The REPL doesn't support that language.")?;
-            return Ok(());
-        };
-
-        // build request payload
-        let payload = Request {
-            project: Project {
-                language: language_name.to_string(),
-                network: true,
-                output_type: None,
-                share: "private".into(),
-                source_files: vec![File {
-                    filename: format!("main{}", language_ext),
-                    body: caps[2].to_string(),
-                    position: 0,
-                }],
-            },
-            run: true,
-            save: false,
-        };
-        debug!("REPL payload: {:?}", payload);
-
-        // make request to the playground
-        let client = reqwest::Client::new();
-        let mut res = match client
-            .post("https://paiza.io/api/projects.json")
-            .json(&payload)
-            .send()
-        {
-            Ok(res) => res,
-            Err(e) => {
-                debug!("Error: {:#?}", e);
-                message.reply("There was an issue sending the code to the REPL.")?;
-                return Ok(());
-            }
-        };
-
-        // deserialize json response into struct
-        let json: Response = match res.json() {
-            Ok(json) => json,
-            Err(e) => {
-                debug!("Error: {:#?}", e);
-                message.reply("There was an issue with the response from the REPL.")?;
-                return Ok(());
-            }
-        };
-        debug!("REPL response: {:?}", json);
-
-        // reply to user
-        let message_builder = match json.result {
-            Some(RunnerResult::Success) => MessageBuilder::new()
-                .mention(&message.author)
-                .push(" ")
-                .push("here's the output:")
-                .push_codeblock(json.stdout.unwrap(), Some(&caps[1]))
-                .push(format!("Code ran in: {}s", json.time.unwrap()))
-                .build(),
-            Some(RunnerResult::Failure) => MessageBuilder::new()
-                .mention(&message.author)
-                .push(" ")
-                .push("your compilation failed... yikes...")
-                .push_codeblock(json.stderr.unwrap(), Some(&caps[1]))
-                .build(),
-            Some(RunnerResult::Timeout) => MessageBuilder::new()
-                .mention(&message.author)
-                .push(" your code timed out... yikes...")
-                .build(),
-            None => {
-                if let Some(stderr) = json.build_stderr {
-                    MessageBuilder::new()
-                        .mention(&message.author)
-                        .push(" ")
-                        .push("your compilation failed... yikes...")
-                        .push_codeblock(stderr, Some(&caps[1]))
-                        .build()
-                } else {
-                    MessageBuilder::new()
-                        .mention(&message.author)
-                        .push(" ")
-                        .push("your compilation failed... yikes...")
-                        .build()
-                }
-            }
-        };
-        if message_builder.len() >= 2000 {
-            message.reply("the response was too large...")?;
-        } else {
-            message.channel_id.say(&message_builder)?;
         }
-});
+    };
+
+    // deserialize json response into struct
+    let json: Response = match res.json() {
+        Ok(json) => json,
+        Err(e) => {
+            debug!("Error: {:#?}", e);
+            msg.reply(&ctx, "There was an issue with the response from the REPL.")?;
+            return Ok(());
+        }
+    };
+
+    // reply to user
+    let message_builder = match json.result {
+        Some(RunnerResult::Success) => MessageBuilder::new()
+            .mention(&msg.author)
+            .push(" ")
+            .push("here's the output:")
+            .push_codeblock(json.stdout.unwrap(), Some(&caps[1]))
+            .push(format!("Code ran in: {}s", json.time.unwrap()))
+            .build(),
+        Some(RunnerResult::Failure) => MessageBuilder::new()
+            .mention(&msg.author)
+            .push(" ")
+            .push("your compilation failed...")
+            .push_codeblock(json.stderr.unwrap(), Some(&caps[1]))
+            .build(),
+        Some(RunnerResult::Timeout) => MessageBuilder::new()
+            .mention(&msg.author)
+            .push(" your code timed out...")
+            .build(),
+        None => {
+            if let Some(stderr) = json.build_stderr {
+                MessageBuilder::new()
+                    .mention(&msg.author)
+                    .push(" ")
+                    .push("your compilation failed... yikes...")
+                    .push_codeblock(stderr, Some(&caps[1]))
+                    .build()
+            } else {
+                MessageBuilder::new()
+                    .mention(&msg.author)
+                    .push(" ")
+                    .push("your compilation failed... yikes...")
+                    .build()
+            }
+        }
+    };
+    if message_builder.len() >= 2000 {
+        msg.reply(&ctx, "the response was too large...")?;
+    } else {
+        msg.channel_id.say(&ctx, &message_builder)?;
+    }
+    Ok(())
+}
