@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: rustup toolchain install ${{ matrix.toolchain }}
+      - run: |
+          rustup toolchain install ${{ matrix.toolchain }}
+          rustup component add rustfmt clippy --toolchain ${{ matrix.toolchain }}
       - run: cargo +${{ matrix.toolchain }} fmt -- --check
       - run: cargo +${{ matrix.toolchain }} clippy -- -Dwarnings
       - run: cargo +${{ matrix.toolchain }} test
