@@ -1,0 +1,14 @@
+name: CI
+on: push
+jobs:
+  build:
+    strategy:
+      matrix:
+        toolchain: [stable, nightly]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: rustup toolchain install ${{ matrix.toolchain }}
+      - run: cargo +${{ matrix.toolchain }} fmt -- --check
+      - run: cargo +${{ matrix.toolchain }} clippy -- -Dwarnings
+      - run: cargo +${{ matrix.toolchain }} test
