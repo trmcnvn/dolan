@@ -2,16 +2,9 @@ name: CI
 on: push
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [stable, nightly]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: |
-          rustup toolchain install ${{ matrix.toolchain }}
-          rustup component add rustfmt clippy --toolchain ${{ matrix.toolchain }}
-      - run: cargo +${{ matrix.toolchain }} fmt -- --check
-      - run: cargo +${{ matrix.toolchain }} clippy -- -Dwarnings
-      - run: cargo +${{ matrix.toolchain }} test
+      - run: cargo fmt -- --check
+      - run: cargo clippy -- -Dwarnings
+      - run: cargo test
