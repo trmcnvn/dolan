@@ -5,7 +5,7 @@ authors = ["Thomas McNiven <hello@vevix.net>"]
 edition = "2018"
 
 [dependencies]
-env_logger = "0.6"
+env_logger = "0.7"
 log = "0.4"
 config = "0.9"
 serde = "1.0"
