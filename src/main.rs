@@ -33,9 +33,8 @@ impl TypeMapKey for ShardManagerContainer {
 struct Handler;
 impl EventHandler for Handler {
     fn ready(&self, context: Context, ready: Ready) {
-        let activity = Activity::playing("World of Warcraft");
+        let activity = Activity::playing("DuckTales");
         context.set_activity(activity);
-
         info!("{} is connected...", ready.user.name);
     }
 }
