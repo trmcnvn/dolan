@@ -162,26 +162,26 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
         Some(RunnerResult::Failure) => MessageBuilder::new()
             .mention(&msg.author)
             .push(" ")
-            .push("your compilation failed...")
+            .push("your compilation failed")
             .push_codeblock(json.stderr.unwrap(), Some(&caps[1]))
             .build(),
         Some(RunnerResult::Timeout) => MessageBuilder::new()
             .mention(&msg.author)
-            .push(" your code timed out...")
+            .push(" your code timed out")
             .build(),
         None => {
             if let Some(stderr) = json.build_stderr {
                 MessageBuilder::new()
                     .mention(&msg.author)
                     .push(" ")
-                    .push("your compilation failed... yikes...")
+                    .push("your compilation failed")
                     .push_codeblock(stderr, Some(&caps[1]))
                     .build()
             } else {
                 MessageBuilder::new()
                     .mention(&msg.author)
                     .push(" ")
-                    .push("your compilation failed... yikes...")
+                    .push("your compilation failed")
                     .build()
             }
         }
