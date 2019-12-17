@@ -309,7 +309,7 @@ dependencies = [
  "serde 1.0.104 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.104 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
- "serenity 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serenity 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "twapi 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1506,7 +1506,7 @@ dependencies = [
 
 [[package]]
 name = "serenity"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2373,7 +2373,7 @@ dependencies = [
 "checksum serde_test 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)" = "110b3dbdf8607ec493c22d5d947753282f3bae73c0f56d322af1e8c78e4c23d5"
 "checksum serde_urlencoded 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)" = "642dd69105886af2efd227f75a520ec9b44a820d65bc133a9131f7d229fd165a"
 "checksum serde_urlencoded 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "9ec5d77e2d4c73717816afac02670d5c4f534ea95ed430442cad02e7a6e32c97"
-"checksum serenity 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "644b296c0c732d33d1258f74a5862e25fa8b91aff16df90e2c98c594d0f019f5"
+"checksum serenity 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)" = "0ada82192f17c29a4769165a1c9387694180856b3a083fe24c243d234dfebff5"
 "checksum sha-1 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "23962131a91661d643c98940b20fcaffe62d776a823247be80a48fcb8b6fce68"
 "checksum siphasher 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "0b8de496cf83d4ed58b6be86c3a275b8602f6ffe98d3024a869e124147a9a3ac"
 "checksum slab 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
