@@ -102,7 +102,7 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
 
     // supported language?
     let (language_name, language_ext) = if let Some(language) = LANGUAGES.get(&caps[1]) {
-        language
+        *language
     } else {
         msg.reply(&ctx, "The REPL doesn't support that language.")?;
         return Ok(());
