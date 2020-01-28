@@ -7,37 +7,36 @@ use serenity::utils::MessageBuilder;
 
 #[command]
 fn weather(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
-    let location = args.current().unwrap_or_default();
-    let endpoint = format!("https://wttr.in/{}?0qT&lang=en", location);
-
     let client = reqwest::Client::new();
-    let request = client.get(&endpoint).header(USER_AGENT, "curl");
-    let mut res = match request.send() {
-        Ok(res) => res,
-        Err(e) => {
-            debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue getting the weather...")?;
-            return Ok(());
-        }
-    };
+    let locations: Vec<&str> = args.rest().split(';').collect();
+    let mut messages = Vec::with_capacity(locations.len());
 
-    let text = match res.text() {
-        Ok(text) => text,
-        Err(e) => {
-            debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue with the weather...")?;
-            return Ok(());
+    for location in locations {
+        let valid_location = location.replace(|c: char| !c.is_ascii(), "");
+        if valid_location.trim().is_empty() {
+            continue;
         }
-    };
 
-    if text.len() >= 2000 {
-        debug!("Message was too long, converting to image...");
-        msg.channel_id.send_message(&ctx, |m| {
-            m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
-        })?;
-    } else {
-        let message_builder = MessageBuilder::new().push_codeblock(text, None).build();
-        msg.channel_id.say(&ctx, &message_builder)?;
+        let endpoint = format!("https://wttr.in/{}?0qT&lang=en", valid_location);
+        let request = client.get(&endpoint).header(USER_AGENT, "curl");
+        if let Ok(mut response) = request.send() {
+            if let Ok(text) = response.text() {
+                messages.push((valid_location, text));
+            }
+        }
     }
+
+    for (location, message) in messages {
+        if message.len() >= 2000 {
+            debug!("Message was too long, converting to image...");
+            msg.channel_id.send_message(&ctx, |m| {
+                m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
+            })?;
+        } else {
+            let message_builder = MessageBuilder::new().push_codeblock(message, None).build();
+            msg.channel_id.say(&ctx, &message_builder)?;
+        }
+    }
+
     Ok(())
 }
