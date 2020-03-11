@@ -18,7 +18,7 @@ fn time(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         }
 
         let endpoint = format!("https://time.is/{}", validated_timezone);
-        let response = reqwest::get(&endpoint)?;
+        let response = reqwest::blocking::get(&endpoint)?;
 
         // If timezone is inacurate, the title will just be the local time for where this bot is running
         let document = Document::from_read(response)?;

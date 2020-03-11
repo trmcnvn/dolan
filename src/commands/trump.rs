@@ -3,7 +3,7 @@ use chrono::DateTime;
 use htmlescape::decode_html;
 use lazy_static::lazy_static;
 use log::debug;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use serenity::framework::standard::{macros::command, Args, CommandResult};
 use serenity::model::prelude::*;
 use serenity::prelude::*;

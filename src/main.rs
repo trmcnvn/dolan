@@ -14,7 +14,6 @@ mod utils;
 
 use crate::settings::SETTINGS;
 use commands::{omega::*, ping::*, repl::*, russia::*, time::*, trump::*, weather::*};
-use env_logger::{Builder, WriteStyle};
 use log::{debug, info, LevelFilter};
 use serenity::{
     client::bridge::gateway::ShardManager,
@@ -22,7 +21,7 @@ use serenity::{
     model::gateway::{Activity, Ready},
     prelude::*,
 };
-use std::{collections::HashSet, sync::Arc};
+use std::{collections::HashSet, env, sync::Arc};
 
 struct ShardManagerContainer;
 impl TypeMapKey for ShardManagerContainer {
@@ -51,16 +50,15 @@ fn main() {
     let settings = SETTINGS.clone();
 
     // Initialize logging
-    let mut builder = Builder::new();
-    let level = if settings.debug {
-        LevelFilter::Debug
-    } else {
-        LevelFilter::Info
-    };
-    builder
-        .filter(Some("dolan"), level)
-        .write_style(WriteStyle::Always)
-        .init();
+    if env::var_os("RUST_LOG").is_none() {
+        let level = if settings.debug {
+            LevelFilter::Debug
+        } else {
+            LevelFilter::Info
+        };
+        env::set_var("RUST_LOG", format!("dolan={}", level));
+    }
+    pretty_env_logger::init();
 
     // Initialize connection to Discord via token
     let mut client = Client::new(settings.token.as_str(), Handler).expect("Connection to Discord");

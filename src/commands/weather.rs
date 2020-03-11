@@ -7,7 +7,7 @@ use serenity::utils::MessageBuilder;
 
 #[command]
 fn weather(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
     let locations: Vec<&str> = args.rest().split(';').collect();
     let mut messages = Vec::with_capacity(locations.len());
 
@@ -19,7 +19,7 @@ fn weather(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 
         let endpoint = format!("https://wttr.in/{}?0qT&lang=en", valid_location);
         let request = client.get(&endpoint).header(USER_AGENT, "curl");
-        if let Ok(mut response) = request.send() {
+        if let Ok(response) = request.send() {
             if let Ok(text) = response.text() {
                 messages.push((valid_location, text));
             }
