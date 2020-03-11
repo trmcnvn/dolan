@@ -1,6 +1,6 @@
 use config::{Config, Environment, File};
 use lazy_static::lazy_static;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]

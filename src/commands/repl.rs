@@ -3,7 +3,7 @@ use log::debug;
 use maplit::hashmap;
 use regex::Regex;
 use reqwest;
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -126,8 +126,8 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     // make request to the playground
-    let client = reqwest::Client::new();
-    let mut res = match client
+    let client = reqwest::blocking::Client::new();
+    let res = match client
         .post("https://paiza.io/api/projects.json")
         .json(&payload)
         .send()
