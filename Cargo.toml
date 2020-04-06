@@ -33,4 +33,4 @@ features = [
     "standard_framework",
     "utils",
 ]
-version = "0.7"
+version = "0.8"
