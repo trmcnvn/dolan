@@ -39,11 +39,9 @@ impl EventHandler for Handler {
 }
 
 // Command Groups
-group!({
-    name: "general",
-    options: {},
-    commands: [ping, omega, time, repl, russia, trump, weather]
-});
+#[group]
+#[commands(ping, omega, time, repl, russia, trump, weather)]
+struct General;
 
 fn main() {
     // Load config
