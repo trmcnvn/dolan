@@ -1,4 +1,3 @@
-use reqwest;
 use select::document::Document;
 use select::predicate::Name;
 use serenity::framework::standard::{macros::command, Args, CommandResult};
