@@ -13,7 +13,15 @@ mod settings;
 mod utils;
 
 use crate::settings::SETTINGS;
-use commands::{omega::*, ping::*, repl::*, russia::*, time::*, trump::*, weather::*};
+use commands::{
+    omega::OMEGA_COMMAND,
+    ping::PING_COMMAND,
+    repl::REPL_COMMAND,
+    russia::RUSSIA_COMMAND,
+    time::TIME_COMMAND,
+    trump::TRUMP_COMMAND,
+    weather::WEATHER_COMMAND,
+};
 use log::{debug, info, LevelFilter};
 use serenity::{
     client::bridge::gateway::ShardManager,
