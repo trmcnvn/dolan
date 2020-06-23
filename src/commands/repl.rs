@@ -2,7 +2,6 @@ use lazy_static::lazy_static;
 use log::debug;
 use maplit::hashmap;
 use regex::Regex;
-use reqwest;
 use serde::{Deserialize, Serialize};
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
