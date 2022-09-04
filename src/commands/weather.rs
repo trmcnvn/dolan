@@ -29,9 +29,11 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     for (location, message) in messages {
         if message.len() >= 2000 {
             debug!("Message was too long, converting to image...");
-            msg.channel_id.send_message(&ctx, |m| {
-                m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
-            }).await?;
+            msg.channel_id
+                .send_message(&ctx, |m| {
+                    m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
+                })
+                .await?;
         } else {
             let message_builder = MessageBuilder::new().push_codeblock(message, None).build();
             msg.channel_id.say(&ctx, &message_builder).await?;

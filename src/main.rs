@@ -2,17 +2,22 @@ mod commands;
 mod settings;
 mod utils;
 
-use crate::settings::SETTINGS;
 use self::commands::{
-    ping::PING_COMMAND, repl::REPL_COMMAND,
-    time::TIME_COMMAND, weather::WEATHER_COMMAND,
+    ping::PING_COMMAND, repl::REPL_COMMAND, time::TIME_COMMAND, weather::WEATHER_COMMAND,
 };
+use crate::settings::SETTINGS;
 use log::{info, LevelFilter};
 use serenity::{
     async_trait,
-    client::bridge::gateway::{ShardManager},
-    framework::{standard::macros::{group, hook}, StandardFramework},
-    model::{channel::Message, gateway::{Activity, Ready}},
+    client::bridge::gateway::ShardManager,
+    framework::{
+        standard::macros::{group, hook},
+        StandardFramework,
+    },
+    model::{
+        channel::Message,
+        gateway::{Activity, Ready},
+    },
     prelude::*,
 };
 use std::{env, sync::Arc};
@@ -41,7 +46,10 @@ struct General;
 
 #[hook]
 async fn before_hook(_: &Context, msg: &Message, cmd_name: &str) -> bool {
-    println!("Recevied command {} from {}#{}", cmd_name, msg.author.name, msg.author.discriminator);
+    println!(
+        "Recevied command {} from {}#{}",
+        cmd_name, msg.author.name, msg.author.discriminator
+    );
     true
 }
 
@@ -60,7 +68,6 @@ async fn main() {
         env::set_var("RUST_LOG", format!("dolan={}", level));
     }
     pretty_env_logger::init();
-
 
     // Build the framework setup
     let framework = StandardFramework::new()

@@ -6,6 +6,7 @@ use serenity::prelude::*;
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id
-        .say(&ctx, get_emoji_by_name(&ctx, msg.guild_id, "Pog")).await?;
+        .say(&ctx, get_emoji_by_name(&ctx, msg.guild_id, "Pog"))
+        .await?;
     Ok(())
 }

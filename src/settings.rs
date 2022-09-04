@@ -14,6 +14,10 @@ lazy_static! {
         let config = Config::builder()
             .add_source(File::with_name("settings"))
             .add_source(Environment::with_prefix("DOLAN"));
-        config.build().expect("Config to build").try_deserialize().expect("Settings deserialization")
+        config
+            .build()
+            .expect("Config to build")
+            .try_deserialize()
+            .expect("Settings deserialization")
     };
 }

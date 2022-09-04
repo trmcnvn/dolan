@@ -95,7 +95,8 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
         msg.reply(
             &ctx,
             "Couldn't parse your code. Make sure you wrap it in language codeblocks.",
-        ).await?;
+        )
+        .await?;
         return Ok(());
     };
 
@@ -103,7 +104,8 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
     let (language_name, language_ext) = if let Some(language) = LANGUAGES.get(&caps[1]) {
         *language
     } else {
-        msg.reply(&ctx, "The REPL doesn't support that language.").await?;
+        msg.reply(&ctx, "The REPL doesn't support that language.")
+            .await?;
         return Ok(());
     };
 
@@ -134,7 +136,8 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
         Ok(res) => res,
         Err(e) => {
             debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue sending the code to the REPL.").await?;
+            msg.reply(&ctx, "There was an issue sending the code to the REPL.")
+                .await?;
             return Ok(());
         }
     };
@@ -144,7 +147,8 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
         Ok(json) => json,
         Err(e) => {
             debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue with the response from the REPL.").await?;
+            msg.reply(&ctx, "There was an issue with the response from the REPL.")
+                .await?;
             return Ok(());
         }
     };
