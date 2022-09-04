@@ -1,30 +1,21 @@
-#![warn(
-    clippy::all,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::style,
-    clippy::complexity,
-    clippy::perf,
-    clippy::correctness
-)]
-
 mod commands;
 mod settings;
 mod utils;
 
 use crate::settings::SETTINGS;
-use commands::{
-    omega::OMEGA_COMMAND, ping::PING_COMMAND, repl::REPL_COMMAND, russia::RUSSIA_COMMAND,
-    time::TIME_COMMAND, trump::TRUMP_COMMAND, weather::WEATHER_COMMAND,
+use self::commands::{
+    ping::PING_COMMAND, repl::REPL_COMMAND,
+    time::TIME_COMMAND, weather::WEATHER_COMMAND,
 };
-use log::{debug, info, LevelFilter};
+use log::{info, LevelFilter};
 use serenity::{
-    client::bridge::gateway::ShardManager,
-    framework::{standard::macros::group, StandardFramework},
-    model::gateway::{Activity, Ready},
+    async_trait,
+    client::bridge::gateway::{ShardManager},
+    framework::{standard::macros::{group, hook}, StandardFramework},
+    model::{channel::Message, gateway::{Activity, Ready}},
     prelude::*,
 };
-use std::{collections::HashSet, env, sync::Arc};
+use std::{env, sync::Arc};
 
 struct ShardManagerContainer;
 impl TypeMapKey for ShardManagerContainer {
@@ -33,20 +24,29 @@ impl TypeMapKey for ShardManagerContainer {
 
 // Discord Event Handler
 struct Handler;
+
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, context: Context, ready: Ready) {
+    async fn ready(&self, context: Context, ready: Ready) {
         let activity = Activity::playing("DuckTales");
-        context.set_activity(activity);
+        context.set_activity(activity).await;
         info!("{} is connected...", ready.user.name);
     }
 }
 
 // Command Groups
 #[group]
-#[commands(ping, omega, time, repl, russia, trump, weather)]
+#[commands(ping, time, repl, weather)]
 struct General;
 
-fn main() {
+#[hook]
+async fn before_hook(_: &Context, msg: &Message, cmd_name: &str) -> bool {
+    println!("Recevied command {} from {}#{}", cmd_name, msg.author.name, msg.author.discriminator);
+    true
+}
+
+#[tokio::main]
+async fn main() {
     // Load config
     let settings = SETTINGS.clone();
 
@@ -61,22 +61,6 @@ fn main() {
     }
     pretty_env_logger::init();
 
-    // Initialize connection to Discord via token
-    let mut client = Client::new(settings.token.as_str(), Handler).expect("Connection to Discord");
-    {
-        let mut data = client.data.write();
-        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
-    }
-
-    // Get owner information
-    let (owners, bot_id) = match client.cache_and_http.http.get_current_application_info() {
-        Ok(info) => {
-            let mut owners = HashSet::new();
-            owners.insert(info.owner.id);
-            (owners, info.id)
-        }
-        Err(why) => panic!("Could not access application info: {:?}", why),
-    };
 
     // Build the framework setup
     let framework = StandardFramework::new()
@@ -84,23 +68,22 @@ fn main() {
             c.allow_dm(true)
                 .case_insensitivity(true)
                 .no_dm_prefix(true)
-                .on_mention(Some(bot_id))
                 .prefix("?")
-                .owners(owners)
                 .with_whitespace(false)
         })
-        .before(|_ctx, msg, command| {
-            debug!(
-                "Received command '{}' from '{}#{}'",
-                command, msg.author.name, msg.author.discriminator
-            );
-            true
-        })
+        .before(before_hook)
         .group(&GENERAL_GROUP);
-    client.with_framework(framework);
+
+    // Initialize connection to Discord via token
+    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
+    let mut client = Client::builder(settings.token.as_str(), intents)
+        .event_handler(Handler)
+        .framework(framework)
+        .await
+        .expect("Create the Discord client");
 
     // Start the application
-    if let Err(e) = client.start_autosharded() {
+    if let Err(e) = client.start_autosharded().await {
         println!("Uh-oh, Dolan malfunctioned: {:#?}", e);
     }
 }

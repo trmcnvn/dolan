@@ -1,8 +1,2 @@
 debug = true
 token = "DISCORD_TOKEN"
-
-[twitter]
-consumer-api-key = "TWITTER_TOKEN"
-consumer-api-secret = "TWITTER_TOKEN"
-access-token = "TWITTER_TOKEN"
-access-token-secret = "TWITTER_TOKEN"

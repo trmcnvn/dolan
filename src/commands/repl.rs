@@ -4,7 +4,7 @@ use maplit::hashmap;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serenity::framework::standard::{macros::command, CommandResult};
-use serenity::model::prelude::*;
+use serenity::model::channel::Message;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 use std::collections::HashMap;
@@ -88,14 +88,14 @@ pub enum RunnerResult {
 }
 
 #[command]
-fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
+async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
     let caps = if let Some(caps) = CODE.captures(&msg.content) {
         caps
     } else {
         msg.reply(
             &ctx,
             "Couldn't parse your code. Make sure you wrap it in language codeblocks.",
-        )?;
+        ).await?;
         return Ok(());
     };
 
@@ -103,7 +103,7 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
     let (language_name, language_ext) = if let Some(language) = LANGUAGES.get(&caps[1]) {
         *language
     } else {
-        msg.reply(&ctx, "The REPL doesn't support that language.")?;
+        msg.reply(&ctx, "The REPL doesn't support that language.").await?;
         return Ok(());
     };
 
@@ -134,7 +134,7 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
         Ok(res) => res,
         Err(e) => {
             debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue sending the code to the REPL.")?;
+            msg.reply(&ctx, "There was an issue sending the code to the REPL.").await?;
             return Ok(());
         }
     };
@@ -144,7 +144,7 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
         Ok(json) => json,
         Err(e) => {
             debug!("Error: {:#?}", e);
-            msg.reply(&ctx, "There was an issue with the response from the REPL.")?;
+            msg.reply(&ctx, "There was an issue with the response from the REPL.").await?;
             return Ok(());
         }
     };
@@ -186,9 +186,9 @@ fn repl(ctx: &mut Context, msg: &Message) -> CommandResult {
         }
     };
     if message_builder.len() >= 2000 {
-        msg.reply(&ctx, "the response was too large...")?;
+        msg.reply(&ctx, "the response was too large...").await?;
     } else {
-        msg.channel_id.say(&ctx, &message_builder)?;
+        msg.channel_id.say(&ctx, &message_builder).await?;
     }
     Ok(())
 }

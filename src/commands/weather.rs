@@ -1,12 +1,12 @@
 use log::debug;
 use reqwest::{self, header::USER_AGENT};
 use serenity::framework::standard::{macros::command, Args, CommandResult};
-use serenity::model::prelude::*;
+use serenity::model::channel::Message;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 
 #[command]
-fn weather(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let client = reqwest::blocking::Client::new();
     let locations: Vec<&str> = args.rest().split(';').collect();
     let mut messages = Vec::with_capacity(locations.len());
@@ -31,10 +31,10 @@ fn weather(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
             debug!("Message was too long, converting to image...");
             msg.channel_id.send_message(&ctx, |m| {
                 m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
-            })?;
+            }).await?;
         } else {
             let message_builder = MessageBuilder::new().push_codeblock(message, None).build();
-            msg.channel_id.say(&ctx, &message_builder)?;
+            msg.channel_id.say(&ctx, &message_builder).await?;
         }
     }
 
