@@ -18,7 +18,7 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             continue;
         }
 
-        let endpoint = format!("https://wttr.in/{}?0qT&lang=en", valid_location);
+        let endpoint = format!("https://wttr.in/{}?m0qT&lang=en", valid_location);
         let request = client.get(&endpoint).header(USER_AGENT, "curl");
         if let Ok(response) = request.send() {
             if let Ok(text) = response.text() {
@@ -32,7 +32,7 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             debug!("Message was too long, converting to image...");
             msg.channel_id
                 .send_message(&ctx, |m| {
-                    m.embed(|e| e.image(format!("https://wttr.in/{}_0q_lang=en.png", location)))
+                    m.embed(|e| e.image(format!("https://wttr.in/{}_m0q_lang=en.png", location)))
                 })
                 .await?;
         } else {
