@@ -1,23 +1,31 @@
+use reqwest::{self, header::USER_AGENT};
 use select::document::Document;
 use select::predicate::Name;
 use serenity::framework::standard::{macros::command, Args, CommandResult};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
+use urlencoding::encode;
 
 /// Melbourne, Australia; Kyiv, Ukraine
 #[command]
 async fn time(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+    let client = reqwest::blocking::Client::new();
     let timezones: Vec<&str> = args.rest().split(';').collect();
     let mut times: Vec<String> = Vec::with_capacity(timezones.len());
     for timezone in timezones {
-        let validated_timezone = timezone.replace(|c: char| !c.is_ascii(), "");
+        let validated_timezone = encode(timezone);
         if validated_timezone.trim().is_empty() {
             continue;
         }
 
         let endpoint = format!("https://time.is/{}", validated_timezone);
-        let response = reqwest::blocking::get(&endpoint)?;
+        let response = client
+            .get(&endpoint)
+            .header(USER_AGENT, "Dolan/1.0")
+            .send()?;
+
+        eprintln!("Response: {:?}", response);
 
         // If timezone is inacurate, the title will just be the local time for where this bot is running
         let document = Document::from_read(response)?;
