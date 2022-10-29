@@ -6,6 +6,7 @@ use self::commands::{
     ping::PING_COMMAND, repl::REPL_COMMAND, time::TIME_COMMAND, weather::WEATHER_COMMAND,
 };
 use crate::settings::SETTINGS;
+use axum::{routing::get, Router};
 use log::{info, LevelFilter};
 use serenity::{
     async_trait,
@@ -20,7 +21,8 @@ use serenity::{
     },
     prelude::*,
 };
-use std::{env, sync::Arc};
+use std::{env, net::SocketAddr, sync::Arc};
+use tokio::spawn;
 
 struct ShardManagerContainer;
 impl TypeMapKey for ShardManagerContainer {
@@ -53,6 +55,10 @@ async fn before_hook(_: &Context, msg: &Message, cmd_name: &str) -> bool {
     true
 }
 
+async fn health_check() -> &'static str {
+    "OK"
+}
+
 #[tokio::main]
 async fn main() {
     // Load config
@@ -68,6 +74,11 @@ async fn main() {
         env::set_var("RUST_LOG", format!("dolan={}", level));
     }
     pretty_env_logger::init();
+
+    // Start webserver for health checks
+    let webapp = Router::new().route("/healthz", get(health_check));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    let web_await = spawn(axum::Server::bind(&addr).serve(webapp.into_make_service()));
 
     // Build the framework setup
     let framework = StandardFramework::new()
@@ -90,7 +101,12 @@ async fn main() {
         .expect("Create the Discord client");
 
     // Start the application
-    if let Err(e) = client.start_autosharded().await {
-        println!("Uh-oh, Dolan malfunctioned: {:#?}", e);
-    }
+    let discord_await = spawn(async move {
+        client.start_autosharded().await.unwrap();
+    });
+
+    // Wait for the awaiters!
+    if let Err(e) = tokio::try_join!(web_await, discord_await) {
+        println!("Error: {:?}", e)
+    };
 }
