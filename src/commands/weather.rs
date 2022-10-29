@@ -4,6 +4,7 @@ use serenity::framework::standard::{macros::command, Args, CommandResult};
 use serenity::model::channel::Message;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
+use urlencoding::encode;
 
 #[command]
 async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
@@ -12,7 +13,7 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let mut messages = Vec::with_capacity(locations.len());
 
     for location in locations {
-        let valid_location = location.replace(|c: char| !c.is_ascii(), "");
+        let valid_location = encode(location);
         if valid_location.trim().is_empty() {
             continue;
         }

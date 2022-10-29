@@ -17,6 +17,7 @@ chrono = { version = "0.4", features = ["serde"] }
 select = "0.5"
 maplit = "1.0"
 tokio = "1.21"
+urlencoding = "*"
 
 [dependencies.serenity]
 default-features = false
