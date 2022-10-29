@@ -36,8 +36,6 @@ async fn time(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 
     if !times.is_empty() {
         let message_builder = MessageBuilder::new()
-            .mention(&msg.author)
-            .push(" ")
             .push_codeblock(times.join("\n"), None)
             .build();
         msg.channel_id.say(&ctx, &message_builder).await?;
