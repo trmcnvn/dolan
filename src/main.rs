@@ -77,7 +77,7 @@ async fn main() {
 
     // Start webserver for health checks
     let webapp = Router::new().route("/healthz", get(health_check));
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 80));
     let web_await = spawn(axum::Server::bind(&addr).serve(webapp.into_make_service()));
 
     // Build the framework setup
