@@ -79,7 +79,15 @@ async fn main() {
     let webapp = Router::new()
         .route("/", get(health_check))
         .route("/healthz", get(health_check));
-    let addr = SocketAddr::from(([0, 0, 0, 0], 10000));
+    let addr = SocketAddr::from((
+        [0, 0, 0, 0],
+        env::var_os("PORT")
+            .unwrap_or("10000".into())
+            .into_string()
+            .unwrap()
+            .parse::<u16>()
+            .unwrap(),
+    ));
     let web_await = spawn(axum::Server::bind(&addr).serve(webapp.into_make_service()));
 
     // Build the framework setup
