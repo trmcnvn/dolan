@@ -115,8 +115,18 @@ async fn main() {
         client.start_autosharded().await.unwrap();
     });
 
+    // Spawn a task to ping oursevles so we don't sleep
+    let awaker_await = spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(60 * 5)).await;
+            reqwest::get("https://dolan-service.onrender.com/")
+                .await
+                .unwrap();
+        }
+    });
+
     // Wait for the awaiters!
-    if let Err(e) = tokio::try_join!(web_await, discord_await) {
+    if let Err(e) = tokio::try_join!(web_await, discord_await, awaker_await) {
         println!("Error: {:?}", e)
     };
 }
