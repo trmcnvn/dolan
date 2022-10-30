@@ -76,7 +76,9 @@ async fn main() {
     pretty_env_logger::init();
 
     // Start webserver for health checks
-    let webapp = Router::new().route("/healthz", get(health_check));
+    let webapp = Router::new()
+        .route("/", get(health_check))
+        .route("/healthz", get(health_check));
     let addr = SocketAddr::from(([0, 0, 0, 0], 10000));
     let web_await = spawn(axum::Server::bind(&addr).serve(webapp.into_make_service()));
 
