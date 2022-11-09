@@ -116,7 +116,7 @@ async fn main() {
     });
 
     // Spawn a task to ping oursevles so we don't sleep
-    let awaker_await = spawn(async move {
+    let awaker_await = spawn(async {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(60 * 5)).await;
             reqwest::get("https://dolan-service.onrender.com/")

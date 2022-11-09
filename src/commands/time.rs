@@ -25,8 +25,6 @@ async fn time(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             .header(USER_AGENT, "Dolan/1.0")
             .send()?;
 
-        eprintln!("Response: {:?}", response);
-
         // If timezone is inacurate, the title will just be the local time for where this bot is running
         let document = Document::from_read(response)?;
         if let Some(time) = document.find(Name("time")).next() {
