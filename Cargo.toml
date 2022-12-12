@@ -14,7 +14,7 @@ reqwest = { version = "0.11", features = ["blocking", "json"] }
 lazy_static = "1.4"
 regex = "1.4"
 chrono = { version = "0.4", features = ["serde"] }
-select = "0.5"
+select = "0.6"
 maplit = "1.0"
 tokio = "1.21"
 axum = "*"
