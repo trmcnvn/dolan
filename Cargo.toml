@@ -16,7 +16,7 @@ regex = "1.4"
 chrono = { version = "0.4", features = ["serde"] }
 select = "0.5"
 maplit = "1.0"
-tokio = "1.21"
+tokio = "1.26"
 axum = "*"
 urlencoding = "*"
 
