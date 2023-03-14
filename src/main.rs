@@ -4,6 +4,7 @@ mod utils;
 
 use self::commands::{
     ping::PING_COMMAND, repl::REPL_COMMAND, time::TIME_COMMAND, weather::WEATHER_COMMAND,
+    diablo::DIABLO_COMMAND,
 };
 use crate::settings::SETTINGS;
 use axum::{routing::get, Router};
@@ -43,7 +44,7 @@ impl EventHandler for Handler {
 
 // Command Groups
 #[group]
-#[commands(ping, time, repl, weather)]
+#[commands(ping, time, repl, weather, diablo)]
 struct General;
 
 #[hook]
