@@ -20,6 +20,7 @@ maplit = "1.0"
 tokio = "1.21"
 axum = "*"
 urlencoding = "*"
+openai = "1.0.0-alpha.8"
 
 [dependencies.serenity]
 default-features = false

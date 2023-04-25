@@ -1,2 +1,3 @@
 debug = true
 token = "DISCORD_TOKEN"
+openai = "OPENAI_KEY"

@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct Settings {
     pub debug: bool,
     pub token: String,
+    pub openai: String,
 }
 
 lazy_static! {
