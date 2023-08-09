@@ -21,7 +21,7 @@ async fn ai(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let message = response.choices.first().unwrap().message.clone();
     // format message
     let discord_message = MessageBuilder::new()
-        .push(&message.content.clone().unwrap().trim())
+        .push(message.content.clone().unwrap().trim())
         .build();
     msg.channel_id.say(&ctx, discord_message).await?;
     Ok(())
