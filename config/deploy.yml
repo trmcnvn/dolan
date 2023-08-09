@@ -6,7 +6,7 @@ image: trmcnvn/dolan
 
 # Deploy to these servers.
 servers:
-  - 139.84.196.199
+  - <%= ENV["MRSK_SERVER"] %>
 
 # Credentials for your image host.
 registry:
@@ -20,6 +20,15 @@ registry:
 # Configure builder setup.
 builder:
   multiarch: false
+
+# Inject ENV variables into containers
+env:
+  clear:
+    DOLAN_DEBUG: true
+    PORT: 10000
+  secret:
+    - DOLAN_TOKEN
+    - DOLAN_OPENAI
 
 # Configure custom arguments for Traefik
 traefik:
