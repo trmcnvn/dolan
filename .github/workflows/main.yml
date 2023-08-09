@@ -55,6 +55,6 @@ jobs:
       - uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-      - uses: amirmarmul/mrsk-deploy-action
+      - uses: amirmarmul/mrsk-deploy-action@v1.0.4
         with:
           args: setup
