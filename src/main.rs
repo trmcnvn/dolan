@@ -77,9 +77,7 @@ async fn main() {
     pretty_env_logger::init();
 
     // Start webserver for health checks
-    let webapp = Router::new()
-        .route("/", get(health_check))
-        .route("/healthz", get(health_check));
+    let webapp = Router::new().route("/healthz", get(health_check));
     let addr = SocketAddr::from((
         [0, 0, 0, 0],
         env::var_os("PORT")
@@ -116,18 +114,8 @@ async fn main() {
         client.start_autosharded().await.unwrap();
     });
 
-    // Spawn a task to ping oursevles so we don't sleep
-    let awaker_await = spawn(async {
-        loop {
-            tokio::time::sleep(std::time::Duration::from_secs(60 * 5)).await;
-            reqwest::get("https://dolan-service.onrender.com/")
-                .await
-                .unwrap();
-        }
-    });
-
     // Wait for the awaiters!
-    if let Err(e) = tokio::try_join!(web_await, discord_await, awaker_await) {
+    if let Err(e) = tokio::try_join!(web_await, discord_await) {
         println!("Error: {:?}", e)
     };
 }
