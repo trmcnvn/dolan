@@ -11,17 +11,17 @@ async fn ai(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     openai::set_key(SETTINGS.clone().openai);
     let prompt = openai::chat::ChatCompletionMessage {
         role: openai::chat::ChatCompletionMessageRole::User,
-        content: owned_args.message().to_string(),
+        content: Some(owned_args.message().to_string()),
         name: Some(msg.author.name.clone()),
+        function_call: None,
     };
     let response = openai::chat::ChatCompletion::builder("gpt-3.5-turbo", vec![prompt])
         .create()
-        .await??;
+        .await?;
     let message = response.choices.first().unwrap().message.clone();
     // format message
     let discord_message = MessageBuilder::new()
-        .mention(&msg.author)
-        .push_codeblock(message.content, None)
+        .push(&message.content.clone().unwrap().trim())
         .build();
     msg.channel_id.say(&ctx, discord_message).await?;
     Ok(())

@@ -10,7 +10,7 @@ use urlencoding::encode;
 /// Melbourne, Australia; Kyiv, Ukraine
 #[command]
 async fn time(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let timezones: Vec<&str> = args.rest().split(';').collect();
     let mut times: Vec<String> = Vec::with_capacity(timezones.len());
     for timezone in timezones {
@@ -23,10 +23,13 @@ async fn time(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         let response = client
             .get(&endpoint)
             .header(USER_AGENT, "Dolan/1.0")
-            .send()?;
+            .send()
+            .await?
+            .text()
+            .await?;
 
         // If timezone is inacurate, the title will just be the local time for where this bot is running
-        let document = Document::from_read(response)?;
+        let document = Document::from(response.as_str());
         if let Some(time) = document.find(Name("time")).next() {
             times.push(format!("{}: {}", timezone, time.text()));
         }

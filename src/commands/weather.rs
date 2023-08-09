@@ -8,7 +8,7 @@ use urlencoding::encode;
 
 #[command]
 async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let mut owned_args = args.to_owned();
     let weather_type = owned_args.single::<u32>().unwrap_or(0);
     let locations: Vec<&str> = owned_args.rest().split(';').collect();
@@ -25,8 +25,8 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             valid_location, weather_type
         );
         let request = client.get(&endpoint).header(USER_AGENT, "curl");
-        if let Ok(response) = request.send() {
-            if let Ok(text) = response.text() {
+        if let Ok(response) = request.send().await {
+            if let Ok(text) = response.text().await {
                 messages.push((valid_location, text));
             }
         }

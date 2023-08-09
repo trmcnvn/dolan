@@ -1,6 +1,4 @@
-use lazy_static::lazy_static;
 use log::debug;
-use maplit::hashmap;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serenity::framework::standard::{macros::command, CommandResult};
@@ -8,44 +6,46 @@ use serenity::model::channel::Message;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 
-lazy_static! {
-    static ref CODE: Regex =
-        Regex::new(r".+\n+\x60{3}(\w+)\n([\s\S]*?)\x60{3}").expect("Compile regex");
+static CODE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r".+\n+\x60{3}(\w+)\n([\s\S]*?)\x60{3}").expect("Compile regex"));
 
-    /// <discord_code_name, (repl_code_name, repl_file_ext)>
-    static ref LANGUAGES: HashMap<&'static str, (&'static str, &'static str)> = hashmap!{
-        "bash" => ("bash", ""),
-        "c" => ("c", ".c"),
-        "csharp" => ("csharp", ".cs"),
-        "cpp" => ("cpp", ".cpp"),
-        "clojure" => ("clojure", ".clj"),
-        "cobol" => ("cobol", ".cob"),
-        "coffeescript" => ("coffeescript", ".coffee"),
-        "d" => ("d", ".d"),
-        "elixir" => ("elixir", ".exs"),
-        "erlang" => ("erlang", ".erl"),
-        "fsharp" => ("fsharp", ".fs"),
-        "go" => ("go", ".go"),
-        "haskell" => ("haskell", ".hs"),
-        "java" => ("java", ".java"),
-        "javascript" => ("javascript", ".js"),
-        "kotlin" => ("kotlin", ".kt"),
-        "mysql" => ("mysql", ".sql"),
-        "objc" => ("objective-c", ".m"),
-        "perl" => ("perl", ".pl"),
-        "php" => ("php", ".php"),
-        "python" => ("python3", ".py"),
-        "python2" => ("python2", ".py"),
-        "r" => ("r", ".R"),
-        "ruby" => ("ruby", ".rb"),
-        "rust" => ("rust", ".rs"),
-        "scala" => ("scala", ".scala"),
-        "scheme" => ("scheme", ".scm"),
-        "swift" => ("swift", ".swift"),
-        "vb" => ("vb", ".vb"),
-    };
-}
+/// <discord_code_name, (repl_code_name, repl_file_ext)>
+type LanguageMap = HashMap<&'static str, (&'static str, &'static str)>;
+static LANGUAGES: LazyLock<LanguageMap> = LazyLock::new(|| {
+    HashMap::from([
+        ("bash", ("bash", "")),
+        ("c", ("c", ".c")),
+        ("csharp", ("csharp", ".cs")),
+        ("cpp", ("cpp", ".cpp")),
+        ("clojure", ("clojure", ".clj")),
+        ("cobol", ("cobol", ".cob")),
+        ("coffeescript", ("coffeescript", ".coffee")),
+        ("d", ("d", ".d")),
+        ("elixir", ("elixir", ".exs")),
+        ("erlang", ("erlang", ".erl")),
+        ("fsharp", ("fsharp", ".fs")),
+        ("go", ("go", ".go")),
+        ("haskell", ("haskell", ".hs")),
+        ("java", ("java", ".java")),
+        ("javascript", ("javascript", ".js")),
+        ("kotlin", ("kotlin", ".kt")),
+        ("mysql", ("mysql", ".sql")),
+        ("objc", ("objective-c", ".m")),
+        ("perl", ("perl", ".pl")),
+        ("php", ("php", ".php")),
+        ("python", ("python3", ".py")),
+        ("python2", ("python2", ".py")),
+        ("r", ("r", ".R")),
+        ("ruby", ("ruby", ".rb")),
+        ("rust", ("rust", ".rs")),
+        ("scala", ("scala", ".scala")),
+        ("scheme", ("scheme", ".scm")),
+        ("swift", ("swift", ".swift")),
+        ("vb", ("vb", ".vb")),
+    ])
+});
 
 #[derive(Debug, Serialize)]
 pub struct Request {
@@ -127,11 +127,12 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     // make request to the playground
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let res = match client
         .post("https://paiza.io/api/projects.json")
         .json(&payload)
         .send()
+        .await
     {
         Ok(res) => res,
         Err(e) => {
@@ -143,7 +144,7 @@ async fn repl(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     // deserialize json response into struct
-    let json: Response = match res.json() {
+    let json: Response = match res.json().await {
         Ok(json) => json,
         Err(e) => {
             debug!("Error: {:#?}", e);
