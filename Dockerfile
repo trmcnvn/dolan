@@ -1,5 +1,5 @@
 # builder
-from rust:latest as builder
+from rustlang/rust:nightly as builder
 run rustup target add x86_64-unknown-linux-musl
 run apt update && apt install -y musl-tools musl-dev
 workdir /dolan
