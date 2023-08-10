@@ -59,10 +59,13 @@ jobs:
       MRSK_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: false
       - uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: unnecessary
-      - uses: amirmarmul/mrsk-deploy-action@v1.0.4
-        with:
-          args: setup
+      - run: gem install mrsk
+      - run: mrsk setup
