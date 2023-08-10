@@ -26,7 +26,6 @@ jobs:
     name: Deploy
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
-    needs: [build]
     env:
       MRSK_SERVER: ${{ secrets.MRSK_SERVER }}
       DOLAN_TOKEN: ${{ secrets.DOLAN_TOKEN }}
