@@ -20,6 +20,8 @@ registry:
 # Configure builder setup.
 builder:
   multiarch: false
+  cache:
+    type: gha
 
 # Inject ENV variables into containers
 env:
@@ -32,7 +34,7 @@ env:
 
 # Configure custom arguments for Traefik
 traefik:
-  host_port: 10000
+  host_port: 80
 
 # Configure a custom healthcheck (default is /up on port 3000)
 healthcheck:
