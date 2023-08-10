@@ -12,7 +12,7 @@ pub struct Settings {
 
 pub static SETTINGS: LazyLock<Settings> = LazyLock::new(|| {
     let config = Config::builder()
-        .add_source(File::with_name("settings"))
+        .add_source(File::with_name("settings").required(false))
         .add_source(Environment::with_prefix("DOLAN"));
     config
         .build()
