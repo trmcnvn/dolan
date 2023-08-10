@@ -6,7 +6,7 @@ workdir /dolan
 copy ./ .
 run cargo build --target x86_64-unknown-linux-musl --release
 # final
-from scratch
+from alpine
 copy --from=builder /dolan/target/x86_64-unknown-linux-musl/release/dolan ./
 expose 10000
 cmd ["./dolan"]
