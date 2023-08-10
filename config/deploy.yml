@@ -38,4 +38,4 @@ traefik:
 healthcheck:
   path: /healthz
   port: 10000
-  max_attempts: 5
+  max_attempts: 20
