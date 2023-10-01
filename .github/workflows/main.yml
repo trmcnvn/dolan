@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint]
     env:
-      MRSK_SERVER: ${{ secrets.MRSK_SERVER }}
+      KAMAL_SERVER: ${{ secrets.MRSK_SERVER }}
       DOLAN_TOKEN: ${{ secrets.DOLAN_TOKEN }}
       DOLAN_OPENAI: ${{ secrets.DOLAN_OPENAI }}
       DOLAN_CF_ACCOUNT: ${{ secrets.DOLAN_CF_ACCOUNT }}
@@ -44,5 +44,5 @@ jobs:
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: unnecessary
-      - run: gem install mrsk
-      - run: mrsk setup
+      - run: gem install kamal
+      - run: kamal setup
