@@ -40,7 +40,7 @@ async fn llama(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         role: "user",
         content: owned_args.message(),
     }];
-    let request = Request { messages: messages };
+    let request = Request { messages };
     let response: Response = client
         .post(&endpoint)
         .bearer_auth(settings.cf_api)

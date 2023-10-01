@@ -41,7 +41,7 @@ async fn translate(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let target_lang = owned_args.single::<String>().unwrap_or("japanese".into());
     let text = owned_args.rest();
     let request = Request {
-        text: text,
+        text,
         source_lang: &source_lang,
         target_lang: &target_lang,
     };
