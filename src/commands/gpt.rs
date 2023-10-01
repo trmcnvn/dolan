@@ -5,7 +5,7 @@ use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 
 #[command]
-async fn ai(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn gpt(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     // send the prompt
     let owned_args = args.to_owned();
     openai::set_key(SETTINGS.clone().openai);

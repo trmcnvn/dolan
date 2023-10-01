@@ -2,12 +2,14 @@ use config::{Config, Environment, File};
 use serde::Deserialize;
 use std::sync::LazyLock;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub struct Settings {
     pub debug: bool,
     pub token: String,
     pub openai: String,
+    pub cf_account: String,
+    pub cf_api: String,
 }
 
 pub static SETTINGS: LazyLock<Settings> = LazyLock::new(|| {
