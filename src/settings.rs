@@ -3,7 +3,6 @@ use serde::Deserialize;
 use std::sync::LazyLock;
 
 #[derive(Deserialize, Clone, Debug)]
-#[serde(rename_all = "kebab-case")]
 pub struct Settings {
     pub debug: bool,
     pub token: String,
