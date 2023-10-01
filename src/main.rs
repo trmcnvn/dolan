@@ -15,7 +15,10 @@ use serenity::{
     async_trait,
     client::bridge::gateway::ShardManager,
     framework::{
-        standard::macros::{group, hook},
+        standard::{
+            macros::{group, hook},
+            CommandError,
+        },
         StandardFramework,
     },
     model::{
@@ -51,8 +54,16 @@ struct General;
 
 #[hook]
 async fn before_hook(_: &Context, msg: &Message, cmd_name: &str) -> bool {
-    println!("Received command {} from {}", cmd_name, msg.author.name);
+    log::info!("Received command {} from {}", cmd_name, msg.author.name);
     true
+}
+
+#[hook]
+async fn after_hook(_: &Context, _: &Message, cmd_name: &str, error: Result<(), CommandError>) {
+    //  Print out an error if it happened
+    if let Err(why) = error {
+        log::error!("Error in {}: {:?}", cmd_name, why);
+    }
 }
 
 async fn health_check() -> &'static str {
@@ -115,6 +126,6 @@ async fn main() {
 
     // Wait for the awaiters!
     if let Err(e) = tokio::try_join!(web_await, discord_await) {
-        println!("Error: {:?}", e)
+        log::error!("Error: {:?}", e)
     };
 }
