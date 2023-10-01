@@ -31,6 +31,8 @@ env:
   secret:
     - DOLAN_TOKEN
     - DOLAN_OPENAI
+    - DOLAN_CF_ACCOUNT
+    - DOLAN_CF_API
 
 # Configure custom arguments for Traefik
 traefik:
