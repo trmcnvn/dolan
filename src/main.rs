@@ -51,10 +51,7 @@ struct General;
 
 #[hook]
 async fn before_hook(_: &Context, msg: &Message, cmd_name: &str) -> bool {
-    println!(
-        "Recevied command {} from {}#{}",
-        cmd_name, msg.author.name, msg.author.discriminator
-    );
+    println!("Received command {} from {}", cmd_name, msg.author.name);
     true
 }
 
