@@ -31,7 +31,7 @@ jobs:
       MRSK_SERVER: ${{ secrets.MRSK_SERVER }}
       DOLAN_TOKEN: ${{ secrets.DOLAN_TOKEN }}
       DOLAN_OPENAI: ${{ secrets.DOLAN_OPENAI }}
-      DOLAN_CF_ACCOUJT: ${{ secrets.DOLAN_CF_ACCOUNT }}
+      DOLAN_CF_ACCOUNT: ${{ secrets.DOLAN_CF_ACCOUNT }}
       DOLAN_CF_API: ${{ secrets.DOLAN_CF_API }}
       MRSK_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
