@@ -15,7 +15,7 @@ regex = "1.9"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-humanize = "0.2"
 select = "0.6"
-tokio = "1.32"
+tokio = "1.33"
 axum = "0.6"
 urlencoding = "2.1"
 openai = { version = "1.0.0-alpha.13", default-features = false, features = ["rustls"] }
