@@ -1,7 +1,9 @@
 pub mod gpt;
 pub mod llama;
+pub mod mistral;
 pub mod ping;
 pub mod repl;
+pub mod sdiff;
 pub mod time;
 pub mod translate;
 pub mod weather;

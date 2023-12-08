@@ -1,5 +1,6 @@
 use log::debug;
 use reqwest::{self, header::USER_AGENT};
+use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::framework::standard::{macros::command, Args, CommandResult};
 use serenity::model::channel::Message;
 use serenity::prelude::*;
@@ -44,16 +45,12 @@ async fn weather(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     for (location, message) in messages {
         if message.len() >= 2000 {
             debug!("Message was too long, converting to image...");
-            msg.channel_id
-                .send_message(&ctx, |m| {
-                    m.embed(|e| {
-                        e.image(format!(
-                            "https://wttr.in/{}_m{}Fq_lang=en.png",
-                            location, weather_type
-                        ))
-                    })
-                })
-                .await?;
+            let embed = CreateEmbed::new().image(format!(
+                "https://wttr.in{}_m{}Fq_lang=en.png",
+                location, weather_type
+            ));
+            let builder = CreateMessage::new().embed(embed);
+            msg.channel_id.send_message(&ctx, builder).await?;
         } else {
             let message_builder = MessageBuilder::new().push_codeblock(message, None).build();
             msg.channel_id.say(&ctx, &message_builder).await?;

@@ -7,36 +7,36 @@ use serenity::utils::MessageBuilder;
 
 #[derive(Debug, Serialize)]
 struct Request<'a> {
-    messages: [LlamaMessage<'a>; 1],
+    messages: [MistralMessage<'a>; 1],
 }
 
 #[derive(Debug, Serialize)]
-struct LlamaMessage<'a> {
+struct MistralMessage<'a> {
     role: &'a str,
     content: &'a str,
 }
 
 #[derive(Debug, Deserialize)]
 struct Response {
-    result: LlamaResponse,
+    result: MistralResponse,
 }
 
 #[derive(Debug, Deserialize)]
-struct LlamaResponse {
+struct MistralResponse {
     response: String,
 }
 
 #[command]
-async fn llama(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn mistral(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     // send the prompt
     let owned_args = args.to_owned();
     let client = reqwest::Client::new();
     let settings = SETTINGS.clone();
     let endpoint = format!(
         "https://api.cloudflare.com/client/v4/accounts/{}/ai/run/{}",
-        settings.cf_account, "@cf/meta/llama-2-7b-chat-fp16"
+        settings.cf_account, "@cf/mistral/mistral-7b-instruct-v0.1"
     );
-    let messages = [LlamaMessage {
+    let messages = [MistralMessage {
         role: "user",
         content: owned_args.message(),
     }];

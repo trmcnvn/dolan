@@ -5,26 +5,24 @@ mod settings;
 mod utils;
 
 use self::commands::{
-    gpt::GPT_COMMAND, llama::LLAMA_COMMAND, ping::PING_COMMAND, repl::REPL_COMMAND,
-    time::TIME_COMMAND, translate::TRANSLATE_COMMAND, weather::WEATHER_COMMAND,
+    gpt::GPT_COMMAND, llama::LLAMA_COMMAND, mistral::MISTRAL_COMMAND, ping::PING_COMMAND,
+    repl::REPL_COMMAND, sdiff::SDIFF_COMMAND, time::TIME_COMMAND, translate::TRANSLATE_COMMAND,
+    weather::WEATHER_COMMAND,
 };
 use crate::settings::SETTINGS;
 use axum::{routing::get, Router};
 use log::{info, LevelFilter};
 use serenity::{
     async_trait,
-    client::bridge::gateway::ShardManager,
     framework::{
         standard::{
             macros::{group, hook},
-            CommandError,
+            CommandError, Configuration,
         },
         StandardFramework,
     },
-    model::{
-        channel::Message,
-        gateway::{Activity, Ready},
-    },
+    gateway::{ActivityData, ShardManager},
+    model::{channel::Message, gateway::Ready},
     prelude::*,
 };
 use std::{env, net::SocketAddr, sync::Arc};
@@ -41,15 +39,15 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, context: Context, ready: Ready) {
-        let activity = Activity::playing("DuckTales");
-        context.set_activity(activity).await;
+        let activity = ActivityData::playing("DuckTales");
+        context.set_activity(Some(activity));
         info!("{} is connected...", ready.user.name);
     }
 }
 
 // Command Groups
 #[group]
-#[commands(ping, time, repl, weather, gpt, llama, translate)]
+#[commands(ping, time, repl, weather, gpt, llama, mistral, translate, sdiff)]
 struct General;
 
 #[hook]
@@ -97,19 +95,23 @@ async fn main() {
             .parse::<u16>()
             .unwrap(),
     ));
-    let web_await = spawn(axum::Server::bind(&addr).serve(webapp.into_make_service()));
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let web_await = spawn(async move {
+        axum::serve(listener, webapp).await.unwrap();
+    });
 
     // Build the framework setup
     let framework = StandardFramework::new()
-        .configure(|c| {
-            c.allow_dm(true)
-                .case_insensitivity(true)
-                .no_dm_prefix(true)
-                .prefix("?")
-                .with_whitespace(false)
-        })
         .before(before_hook)
         .group(&GENERAL_GROUP);
+    framework.configure(
+        Configuration::new()
+            .allow_dm(true)
+            .case_insensitivity(true)
+            .no_dm_prefix(true)
+            .prefix("?")
+            .with_whitespace(false),
+    );
 
     // Initialize connection to Discord via token
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
@@ -121,7 +123,7 @@ async fn main() {
 
     // Start the application
     let discord_await = spawn(async move {
-        client.start_autosharded().await.unwrap();
+        client.start().await.unwrap();
     });
 
     // Wait for the awaiters!

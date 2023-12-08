@@ -12,7 +12,7 @@ pub fn get_emoji_by_name(
             let emojis = &guild.emojis;
             for emoji in emojis.values() {
                 if emoji.name == name {
-                    return format!("<:{}:{}>", name, emoji.id.as_u64());
+                    return format!("<:{}:{}>", name, emoji.id.get());
                 }
             }
         }

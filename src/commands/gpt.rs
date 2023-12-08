@@ -57,7 +57,7 @@ async fn gpt(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     };
     let mut messages = vec![prompt];
     let response = ChatCompletion::builder("gpt-3.5-turbo", messages.clone())
-        .user(msg.author.id.0.to_string())
+        .user(msg.author.id.get().to_string())
         .functions(FUNCTIONS.clone())
         .function_call("auto")
         .create()
@@ -82,7 +82,7 @@ async fn gpt(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
                         ),
                         function_call: None,
                     });
-                    function_gpt(msg.author.id.0.to_string(), &messages)
+                    function_gpt(msg.author.id.get().to_string(), &messages)
                         .await?
                         .trim()
                         .into()
