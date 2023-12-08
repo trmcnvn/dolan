@@ -3,7 +3,6 @@ on:
     branches:
       - master
   pull_request:
-
 name: CI
 jobs:
   lint:
@@ -33,7 +32,7 @@ jobs:
       DOLAN_OPENAI: ${{ secrets.DOLAN_OPENAI }}
       DOLAN_CF_ACCOUNT: ${{ secrets.DOLAN_CF_ACCOUNT }}
       DOLAN_CF_API: ${{ secrets.DOLAN_CF_API }}
-      MRSK_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1

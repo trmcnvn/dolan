@@ -45,14 +45,14 @@ async fn translate(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         source_lang: &source_lang,
         target_lang: &target_lang,
     };
-    let response: Response = client
+    log::info!("{:?}", request);
+    let response = client
         .post(&endpoint)
         .bearer_auth(settings.cf_api)
-        .json(&request)
-        .send()
-        .await?
-        .json()
-        .await?;
+        .json(&request);
+    log::info!("{:?}", response);
+    let response: Response = response.send().await?.json().await?;
+    log::info!("{:?}", response);
     let discord_message = MessageBuilder::new()
         .push(response.result.translated_text.translated_text)
         .build();
