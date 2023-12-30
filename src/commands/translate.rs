@@ -14,12 +14,7 @@ struct Request<'a> {
 
 #[derive(Debug, Deserialize)]
 struct Response {
-    result: TranslationResponseWrapper,
-}
-
-#[derive(Debug, Deserialize)]
-struct TranslationResponseWrapper {
-    translated_text: TranslationResponse,
+    result: TranslationResponse,
 }
 
 #[derive(Debug, Deserialize)]
@@ -49,9 +44,10 @@ async fn translate(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         .post(&endpoint)
         .bearer_auth(settings.cf_api)
         .json(&request);
-    let response: Response = response.send().await?.json().await?;
+    let response = response.send().await?;
+    let response: Response = response.json().await?;
     let discord_message = MessageBuilder::new()
-        .push(response.result.translated_text.translated_text)
+        .push(response.result.translated_text)
         .build();
     msg.channel_id.say(&ctx, discord_message).await?;
     Ok(())
