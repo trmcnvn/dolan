@@ -7,36 +7,36 @@ use serenity::utils::MessageBuilder;
 
 #[derive(Debug, Serialize)]
 struct Request<'a> {
-    messages: [MistralMessage<'a>; 1],
+    messages: [CoderMessage<'a>; 1],
 }
 
 #[derive(Debug, Serialize)]
-struct MistralMessage<'a> {
+struct CoderMessage<'a> {
     role: &'a str,
     content: &'a str,
 }
 
 #[derive(Debug, Deserialize)]
 struct Response {
-    result: MistralResponse,
+    result: CoderResponse,
 }
 
 #[derive(Debug, Deserialize)]
-struct MistralResponse {
+struct CoderResponse {
     response: String,
 }
 
 #[command]
-async fn mistral(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn coder(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     // send the prompt
     let owned_args = args.to_owned();
     let client = reqwest::Client::new();
     let settings = SETTINGS.clone();
     let endpoint = format!(
         "https://api.cloudflare.com/client/v4/accounts/{}/ai/run/{}",
-        settings.cf_account, "@cf/mistral/mistral-7b-instruct-v0.1"
+        settings.cf_account, "@hf/thebloke/deepseek-coder-6.7b-instruct-awq"
     );
-    let messages = [MistralMessage {
+    let messages = [CoderMessage {
         role: "user",
         content: owned_args.message(),
     }];

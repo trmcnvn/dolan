@@ -34,7 +34,7 @@ async fn llama(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let settings = SETTINGS.clone();
     let endpoint = format!(
         "https://api.cloudflare.com/client/v4/accounts/{}/ai/run/{}",
-        settings.cf_account, "@cf/meta/llama-2-7b-chat-fp16"
+        settings.cf_account, "@cf/meta/llama-3-8b-instruct"
     );
     let messages = [LlamaMessage {
         role: "user",

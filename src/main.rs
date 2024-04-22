@@ -5,7 +5,7 @@ mod settings;
 mod utils;
 
 use self::commands::{
-    gpt::GPT_COMMAND, llama::LLAMA_COMMAND, mistral::MISTRAL_COMMAND, ping::PING_COMMAND,
+    coder::CODER_COMMAND, gpt::GPT_COMMAND, llama::LLAMA_COMMAND, ping::PING_COMMAND,
     repl::REPL_COMMAND, sdiff::SDIFF_COMMAND, time::TIME_COMMAND, translate::TRANSLATE_COMMAND,
     weather::WEATHER_COMMAND,
 };
@@ -47,7 +47,7 @@ impl EventHandler for Handler {
 
 // Command Groups
 #[group]
-#[commands(ping, time, repl, weather, gpt, llama, mistral, translate, sdiff)]
+#[commands(ping, time, repl, weather, gpt, llama, coder, translate, sdiff)]
 struct General;
 
 #[hook]
