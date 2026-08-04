@@ -1,14 +1,8 @@
-#![feature(lazy_cell)]
-
 mod commands;
 mod settings;
 mod utils;
 
-use self::commands::{
-    coder::CODER_COMMAND, gpt::GPT_COMMAND, llama::LLAMA_COMMAND, ping::PING_COMMAND,
-    repl::REPL_COMMAND, sdiff::SDIFF_COMMAND, time::TIME_COMMAND, translate::TRANSLATE_COMMAND,
-    weather::WEATHER_COMMAND,
-};
+use self::commands::{ping::PING_COMMAND, time::TIME_COMMAND, weather::WEATHER_COMMAND};
 use crate::settings::SETTINGS;
 use axum::{routing::get, Router};
 use log::{info, LevelFilter};
@@ -21,17 +15,12 @@ use serenity::{
         },
         StandardFramework,
     },
-    gateway::{ActivityData, ShardManager},
+    gateway::ActivityData,
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
-use std::{env, net::SocketAddr, sync::Arc};
+use std::{env, net::SocketAddr};
 use tokio::spawn;
-
-struct ShardManagerContainer;
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<Mutex<ShardManager>>;
-}
 
 // Discord Event Handler
 struct Handler;
@@ -47,7 +36,7 @@ impl EventHandler for Handler {
 
 // Command Groups
 #[group]
-#[commands(ping, time, repl, weather, gpt, llama, coder, translate, sdiff)]
+#[commands(ping, time, weather)]
 struct General;
 
 #[hook]

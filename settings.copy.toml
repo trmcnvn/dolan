@@ -1,5 +1,2 @@
 debug = true
 token = "DISCORD_TOKEN"
-openai = "OPENAI_KEY"
-cf_account = "CF_ACCOUNT_ID"
-cf_api = "CF_API_TOKEN"

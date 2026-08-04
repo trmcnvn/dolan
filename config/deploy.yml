@@ -1,27 +1,23 @@
 # Name of your application. Used to uniquely configure containers.
 service: dolan
+minimum_version: 2.0.0
 
 # Name of the container image.
-image: trmcnvn/dolan
+image: dolan
 
-# Deploy to these servers.
+# Deploy to the exe.dev VM.
 servers:
-  - <%= ENV["KAMAL_SERVER"] %>
+  - dolan.exe.xyz
 
-# Credentials for your image host.
+# Use a temporary local registry while deploying over SSH.
 registry:
-  # Specify the registry server, if you're not using Docker Hub
-  server: ghcr.io
-  username: trmcnvn
-  # Always use an access token rather than real password when possible.
-  password:
-    - KAMAL_REGISTRY_PASSWORD
+  server: localhost:5555
 
 # Configure builder setup.
 builder:
-  multiarch: false
-  cache:
-    type: gha
+  arch: amd64
+  local: true
+  context: .
 
 # Inject ENV variables into containers
 env:
@@ -30,16 +26,12 @@ env:
     PORT: 10000
   secret:
     - DOLAN_TOKEN
-    - DOLAN_OPENAI
-    - DOLAN_CF_ACCOUNT
-    - DOLAN_CF_API
 
-# Configure custom arguments for Traefik
-traefik:
-  host_port: 80
+# Route traffic to the application's health-check server.
+proxy:
+  app_port: 10000
+  healthcheck:
+    path: /healthz
 
-# Configure a custom healthcheck (default is /up on port 3000)
-healthcheck:
-  path: /healthz
-  port: 10000
-  max_attempts: 20
+ssh:
+  user: exedev

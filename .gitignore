@@ -3,3 +3,4 @@
 settings.toml
 .vscode/
 .env
+.kamal/secrets

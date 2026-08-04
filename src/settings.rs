@@ -6,9 +6,6 @@ use std::sync::LazyLock;
 pub struct Settings {
     pub debug: bool,
     pub token: String,
-    pub openai: String,
-    pub cf_account: String,
-    pub cf_api: String,
 }
 
 pub static SETTINGS: LazyLock<Settings> = LazyLock::new(|| {

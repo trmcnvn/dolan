@@ -7,18 +7,7 @@ use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 use urlencoding::encode;
 
-pub async fn get_weather_json(location: &str, weather_type: u32) -> serde_json::Value {
-    let client = reqwest::Client::new();
-    let endpoint = format!(
-        "https://wttr.in/{}?m{}FqT&lang=en&format=j1",
-        location, weather_type
-    );
-    let request = client.get(&endpoint).header(USER_AGENT, "curl");
-    let response = request.send().await.unwrap();
-    response.json().await.unwrap()
-}
-
-pub async fn get_weather_pretty(location: &str, weather_type: u32) -> String {
+async fn get_weather_pretty(location: &str, weather_type: u32) -> String {
     let client = reqwest::Client::new();
     let endpoint = format!("https://wttr.in/{}?m{}FqT&lang=en", location, weather_type);
     let request = client.get(&endpoint).header(USER_AGENT, "curl");

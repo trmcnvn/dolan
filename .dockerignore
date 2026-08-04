@@ -1,0 +1,7 @@
+.git
+.jj
+.kamal
+target
+.env
+.env.*
+settings.toml
