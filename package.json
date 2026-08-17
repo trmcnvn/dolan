@@ -1,0 +1,31 @@
+{
+  "name": "dolan",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "alchemy dev",
+    "deploy": "alchemy deploy",
+    "destroy": "alchemy destroy",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check .",
+    "lint": "oxlint",
+    "register:commands": "bun run scripts/register-commands.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run lint && bun run fmt:check"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "4.0.0-rc.110",
+    "@effect/platform-node": "4.0.0-rc.110",
+    "alchemy": "2.0.0-beta.72",
+    "effect": "4.0.0-rc.110"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260817.1",
+    "@oxlint/plugins": "1.78.0",
+    "@types/bun": "^1.3.14",
+    "oxfmt": "0.63.0",
+    "oxlint": "1.78.0",
+    "typescript": "7.0.2"
+  }
+}

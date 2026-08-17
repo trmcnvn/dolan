@@ -2,4 +2,38 @@
 
 ## Dolan
 
-Simple Discord bot used on a personal Discord server.
+Simple Discord bot for a personal Discord server, now deployed as a Cloudflare Worker using Discord slash-command interactions.
+
+### Setup
+
+```sh
+bun install
+cp .env.example .env
+```
+
+Fill in the Discord values in `.env`.
+
+### Development
+
+```sh
+bun run typecheck
+bun run dev
+```
+
+Set the Discord interaction endpoint to the Worker URL, either `/` or `/interactions`.
+
+### Register slash commands
+
+```sh
+bun run register:commands
+```
+
+Set `DISCORD_GUILD_ID` for fast guild-scoped testing, or omit it for global commands.
+
+### Deploy
+
+```sh
+bun run deploy
+```
+
+Alchemy handles the Cloudflare Worker infrastructure and binds `DISCORD_PUBLIC_KEY` plus optional `PING_EMOJI` from your environment.

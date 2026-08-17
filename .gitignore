@@ -1,6 +1,6 @@
-/target
-**/*.rs.bk
-settings.toml
-.vscode/
+node_modules/
 .env
-.kamal/secrets
+.alchemy/
+.wrangler/
+dist/
+.vscode/
