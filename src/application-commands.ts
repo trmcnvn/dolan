@@ -15,7 +15,7 @@ export const applicationCommands = [
       {
         type: ApplicationCommandOptionType.String,
         name: "locations",
-        description: "Semicolon-separated locations, e.g. Melbourne; Kyiv",
+        description: "Up to 5 semicolon-separated locations, e.g. Melbourne; Kyiv",
         required: true,
       },
     ],
@@ -27,7 +27,7 @@ export const applicationCommands = [
       {
         type: ApplicationCommandOptionType.String,
         name: "locations",
-        description: "Semicolon-separated locations, e.g. Melbourne; Kyiv",
+        description: "Up to 5 semicolon-separated locations, e.g. Melbourne; Kyiv",
         required: true,
       },
       {

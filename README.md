@@ -16,11 +16,12 @@ Fill in the Discord values in `.env`.
 ### Development
 
 ```sh
-bun run typecheck
+bun run check
 bun run dev
 ```
 
 Set the Discord interaction endpoint to the Worker URL, either `/` or `/interactions`.
+Time and weather commands accept up to five semicolon-separated locations.
 
 ### Register slash commands
 

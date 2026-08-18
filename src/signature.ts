@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+const MAX_SIGNATURE_AGE_SECONDS = 5 * 60;
+
 const hexToBytes = (hex: string) => {
   const normalized = hex.trim();
   if (normalized.length % 2 !== 0 || /[^0-9a-f]/iu.test(normalized)) {
@@ -27,12 +29,21 @@ export const verifyDiscordRequest = Effect.fn("verifyDiscordRequest")(function* 
   publicKey,
   signature,
   timestamp,
+  now = Date.now(),
 }: {
   body: string;
   publicKey: string;
   signature: string;
   timestamp: string;
+  now?: number;
 }): Effect.fn.Return<boolean> {
+  const timestampSeconds = Number(timestamp);
+  const ageSeconds = Math.abs(now / 1_000 - timestampSeconds);
+
+  if (!Number.isFinite(timestampSeconds) || ageSeconds > MAX_SIGNATURE_AGE_SECONDS) {
+    return false;
+  }
+
   return yield* Effect.promise(async () => {
     try {
       const publicKeyBytes = hexToBytes(publicKey);

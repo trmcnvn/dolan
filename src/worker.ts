@@ -1,18 +1,21 @@
-import { Effect, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 import type { WorkerEnv } from "../alchemy.run.ts";
-import { handleCommand } from "./commands.ts";
+import { type CommandConfig, handleCommand, type TimeParseError } from "./commands.ts";
 import {
   deferredResponse,
-  editOriginalInteractionResponse,
+  DiscordClient,
+  DiscordInteractionSchema,
+  type DiscordInteraction,
   InteractionResponseType,
   InteractionType,
   jsonResponse,
   messageResponse,
   MessageFlags,
-  DiscordInteractionSchema,
-  type DiscordInteraction,
 } from "./discord.ts";
+import { HttpClient, type HttpError } from "./http-client.ts";
 import { verifyDiscordRequest } from "./signature.ts";
+
+const RuntimeLive = Layer.merge(HttpClient.layer, DiscordClient.layer);
 
 const unauthorized = () => new Response("Invalid signature", { status: 401 });
 const notFound = () => new Response("Not found", { status: 404 });
@@ -20,28 +23,35 @@ const methodNotAllowed = () => new Response("Method not allowed", { status: 405 
 
 const parseInteraction = Schema.decodeUnknownEffect(DiscordInteractionSchema);
 
-const commandConfig = (env: WorkerEnv) => ({ pingEmoji: env.PING_EMOJI });
-
-const handleDeferredCommand = Effect.fn("handleDeferredCommand")(function* (
-  interaction: DiscordInteraction,
-  env: WorkerEnv,
-) {
-  return yield* handleCommand(interaction, commandConfig(env)).pipe(
-    Effect.flatMap((data) =>
-      Effect.tryPromise(() => editOriginalInteractionResponse(interaction, data)),
-    ),
-    Effect.catch((error) =>
-      Effect.tryPromise(() =>
-        editOriginalInteractionResponse(interaction, {
-          content: `Sorry, that failed: ${String(error)}`,
-        }),
-      ),
-    ),
-    Effect.catch((error) =>
-      Effect.sync(() => console.error("Failed to edit Discord interaction", error)),
-    ),
-  );
+const commandConfig = (env: WorkerEnv): CommandConfig => ({
+  pingEmoji: env.PING_EMOJI,
 });
+
+const commandErrorResponse = (error: HttpError | TimeParseError) => {
+  switch (error._tag) {
+    case "HttpError":
+      return {
+        content: `The upstream service failed for ${error.url}: ${error.message}`,
+      };
+    case "TimeParseError":
+      return {
+        content: `The time service returned an unexpected response for ${error.location}.`,
+      };
+  }
+};
+
+export const handleDeferredCommand = Effect.fn("handleDeferredCommand")(
+  function* (interaction: DiscordInteraction, config: CommandConfig) {
+    const discord = yield* DiscordClient;
+    const data = yield* handleCommand(interaction, config).pipe(
+      Effect.catch((error) => Effect.succeed(commandErrorResponse(error))),
+    );
+    yield* discord.editOriginalResponse(interaction, data);
+  },
+  Effect.catch((error) =>
+    Effect.sync(() => console.error("Failed to edit Discord interaction", error)),
+  ),
+);
 
 const handleInteraction = Effect.fn("handleInteraction")(
   function* (request: Request, env: WorkerEnv, context: ExecutionContext) {
@@ -80,11 +90,16 @@ const handleInteraction = Effect.fn("handleInteraction")(
     }
 
     if (interaction.data?.name === "ping") {
-      const data = yield* handleCommand(interaction, commandConfig(env));
+      const data = yield* handleCommand(interaction, commandConfig(env)).pipe(
+        Effect.provide(HttpClient.layer),
+      );
       return jsonResponse(messageResponse(data));
     }
 
-    context.waitUntil(Effect.runPromise(handleDeferredCommand(interaction, env)));
+    const deferred = handleDeferredCommand(interaction, commandConfig(env)).pipe(
+      Effect.provide(RuntimeLive),
+    );
+    context.waitUntil(Effect.runPromise(deferred));
     return jsonResponse(deferredResponse());
   },
   Effect.catch((error) =>
